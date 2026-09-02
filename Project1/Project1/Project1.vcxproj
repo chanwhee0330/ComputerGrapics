@@ -145,7 +145,10 @@
     <ResourceCompile Include="Project1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="warmmingup1.c" />
+    <ClCompile Include="warmmingup1.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="warmmingup2.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
