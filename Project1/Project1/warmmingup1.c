@@ -270,7 +270,7 @@ int main()
 			{
 				for (int j = 0; j < 4; j++)
 				{
-					printf("%d ", col3[i].row[j]);
+					printf("%4d ", col3[i].row[j]);
 				}
 				printf("\n");
 			}
