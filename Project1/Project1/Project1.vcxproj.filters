@@ -31,5 +31,8 @@
     <ClCompile Include="warmmingup2.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="warmmingup3.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

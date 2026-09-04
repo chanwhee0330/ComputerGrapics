@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{128B2517-07AC-41A1-9EDB-064557BCF529}|Project1\\Project1.vcxproj|C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup3.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{128B2517-07AC-41A1-9EDB-064557BCF529}|Project1\\Project1.vcxproj|solutionrelative:Project1\\warmmingup3.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{128B2517-07AC-41A1-9EDB-064557BCF529}|Project1\\Project1.vcxproj|C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup2.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{128B2517-07AC-41A1-9EDB-064557BCF529}|Project1\\Project1.vcxproj|solutionrelative:Project1\\warmmingup2.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -26,19 +30,32 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "warmmingup3.c",
+              "DocumentMoniker": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup3.c",
+              "RelativeDocumentMoniker": "Project1\\warmmingup3.c",
+              "ToolTip": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup3.c",
+              "RelativeToolTip": "Project1\\warmmingup3.c",
+              "ViewState": "AgIAALIAAAAAAAAAAAAEwMEAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2026-09-04T11:09:05.361Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "warmmingup2.c",
               "DocumentMoniker": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup2.c",
               "RelativeDocumentMoniker": "Project1\\warmmingup2.c",
               "ToolTip": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup2.c",
               "RelativeToolTip": "Project1\\warmmingup2.c",
-              "ViewState": "AgIAAPwAAAAAAAAAAAAUwCABAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAPwAAAAAAAAAAAAUwBkBAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2026-09-02T11:20:18.112Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "stdio.h",
               "DocumentMoniker": "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\ucrt\\stdio.h",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\..\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\ucrt\\stdio.h",
@@ -50,7 +67,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "warmmingup1.c",
               "DocumentMoniker": "C:\\Users\\G\\Documents\\GitHub\\ComputerGrapics\\Project1\\Project1\\warmmingup1.c",
               "RelativeDocumentMoniker": "Project1\\warmmingup1.c",
