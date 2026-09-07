@@ -31,17 +31,48 @@ void openFile()
 	fclose(file);
 }
 
+bool isd = false,isf=false,ish=false,isc=false;
 void print()
 {
-	for (int i = 0;i < 10;i++)
-		printf("%s\n", lines[i]);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+	if (isc == true)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			int count = 0;
+			for (int j = 0; lines[i][j] != '\0'; j++)
+			{
+				if (lines[i][j] >= 'A' && lines[i][j] <= 'Z' && (j == 0 || lines[i][j - 1] == ' '||lines[i][j-1]=='*'))
+				{
+					count++;
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+					printf("%c", lines[i][j]);
+				}
+				else if (lines[i][j] == ' '||lines[i][j]=='*')
+				{
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+					printf("%c", lines[i][j]);
+				}
+				else
+				{
+					printf("%c", lines[i][j]);
+				}
+			}
+			printf(" %d개\n", count);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			printf("%s\n", lines[i]);
+		}
+	}
 }
-
 int main()
 {
 	openFile();
 	char command;
-	bool isd = false,isf=false,ish=false;
 	print();
 	while (1)
 	{
@@ -83,29 +114,40 @@ int main()
 		}
 		else if (command == 'c')
 		{
-			for (int i = 0;i < 10;i++)
+			if (isc == false)
 			{
-				int count = 0;
-				for (int j = 0;lines[i][j] != '\0';j++)
+				for (int i = 0; i < 10; i++)
 				{
-					if (lines[i][j]>='A'&&lines[i][j]<='Z'&&(j==0||lines[i][j-1]==' '))
+					int count = 0;
+					for (int j = 0; lines[i][j] != '\0'; j++)
 					{
-						count++;
-						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-						printf("%c", lines[i][j]);
+						if (lines[i][j] >= 'A' && lines[i][j] <= 'Z' && (j == 0 || lines[i][j - 1] == ' '))
+						{
+							count++;
+							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+							printf("%c", lines[i][j]);
+						}
+						else if (lines[i][j] == ' ')
+						{
+							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+							printf("%c", lines[i][j]);
+						}
+						else
+						{
+							printf("%c", lines[i][j]);
+						}
 					}
-					else if (lines[i][j]==' ')
-					{
-						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-						printf("%c", lines[i][j]);
-					}
-					else
-					{
-						printf("%c", lines[i][j]);
-					}
+					printf(" %d개\n", count);
 				}
-				printf(" %d개\n", count);
+				isc = true;
 			}
+			else if (isc == true)
+			{
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+				isc = false;
+				print();
+			}
+			
 		}
 		else if (command == 'd')
 		{
@@ -163,6 +205,8 @@ int main()
 
 						if (lines[i][j] == ' ')
 							printf(" ");
+						else if (lines[i][j] == '*')
+							printf("*");
 					}
 					printf("\n");
 				}
@@ -171,7 +215,7 @@ int main()
 			else
 			{
 				print();
-				isf = true;
+				isf = false;
 			}
 		}
 		else if (command == 'g')

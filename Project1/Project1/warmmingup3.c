@@ -39,22 +39,39 @@ int main()
 		{
 			int x, y, z;
 			scanf("%d %d %d", &x, &y, &z);
-			bool isfull = true;
-			
-			for (int i = 0;i < 10;i++)
+
+			int start = 0;
+
+			// 가장 높은 인덱스의 데이터 다음 칸
+			for (int i = 9; i >= 0; i--)
 			{
-				if (list[i].isalive == false)
+				if (list[i].isalive)
 				{
-					list[i].isalive = true;
-					list[i].x = x;
-					list[i].y = y;
-					list[i].z = z;
+					start = (i + 1) % 10;
+					break;
+				}
+			}
+
+			bool isfull = true;
+
+			// 9번 다음은 0번으로 돌아가며 빈칸 검색
+			for (int count = 0; count < 10; count++)
+			{
+				int index = (start + count) % 10;
+
+				if (!list[index].isalive)
+				{
+					list[index].isalive = true;
+					list[index].x = x;
+					list[index].y = y;
+					list[index].z = z;
 
 					isfull = false;
 					break;
 				}
 			}
-			if (isfull == true)
+
+			if (isfull)
 			{
 				printf("리스트가 꽉찼습니다.\n");
 			}
@@ -130,14 +147,14 @@ int main()
 		}
 		else if (command == 'b')
 		{
-			List temp = list[9];
+			List temp = list[0];
 
-			for (int i = 9; i > 0; i--)
+			for (int i = 0; i < 10; i++)
 			{
-				list[i] = list[i - 1];
+				list[i] = list[i + 1];
 			}
 
-			list[0] = temp;
+			list[9] = temp;
 		}
 		else if (command == 'c')
 		{

@@ -221,21 +221,25 @@ int main()
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					col1[i].max = col1[i].row[0].x;
-					col2[i].max = col2[i].row[0].x;
+					col1[i].max = col1[0].row[i].x;
+					col2[i].max = col2[0].row[i].x;
+
 					for (int j = 0; j < 4; j++)
 					{
-						if (col1[i].row[j].x > col1[i].max)
-							col1[i].max = col1[i].row[j].x;
-						if (col2[i].row[j].x > col2[i].max)
-							col2[i].max = col2[i].row[j].x;
+						if (col1[j].row[i].x > col1[i].max)
+							col1[i].max = col1[j].row[i].x;
+
+						if (col2[j].row[i].x > col2[i].max)
+							col2[i].max = col2[j].row[i].x;
 					}
+
 					for (int j = 0; j < 4; j++)
 					{
-						col1[i].row[j].x += col1[i].max;
-						col2[i].row[j].x += col2[i].max;
+						col1[j].row[i].x += col1[i].max;
+						col2[j].row[i].x += col2[i].max;
 					}
 				}
+
 				printmatrix();
 				check1 = 1;
 			}
