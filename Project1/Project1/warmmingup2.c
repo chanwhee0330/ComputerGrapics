@@ -1,335 +1,180 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <Windows.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
 
-
 char lines[10][100];
-char temp[100];
+bool isa = false, isc = false, isd = false, ise = false;
+bool isf = false, isg = false, ish = false;
+char change, replacement;
 
-void openFile()
+void openFile(void)
 {
 	FILE* file = fopen("test.txt", "r");
 	if (file == NULL)
 	{
-		printf("파일을 찾을 수 없습니다.");
+		printf("파일을 찾을 수 없습니다.\n");
 		return;
 	}
-
-	char line[200];
-	for (int i = 0;i < 10;i++)
+	for (int i = 0; i < 10; i++)
 	{
-		if ((fgets(line, sizeof(line), file)) == NULL)
+		if (fgets(lines[i], sizeof(lines[i]), file) == NULL)
 			break;
-		strcpy(lines[i], line);
-		lines[i][strcspn(lines[i], "\n")] = '\0';
+		lines[i][strcspn(lines[i], "\r\n")] = '\0';
+		// 긴 줄의 나머지가 다음 줄로 들어가지 않도록 건너뛴다.
+		if (strlen(lines[i]) == sizeof(lines[i]) - 1)
+		{
+			int ch;
+			while ((ch = fgetc(file)) != '\n' && ch != EOF) {}
+		}
 	}
-
 	fclose(file);
 }
 
-bool isd = false,isf=false,ish=false,isc=false;
-void print()
+bool isSeparator(char ch)
 {
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-	if (isc == true)
+	return ch == ' ' || ch == '*';
+}
+
+void reverse(char* line, int start, int end)
+{
+	while (start < end)
 	{
-		for (int i = 0; i < 10; i++)
-		{
-			int count = 0;
-			for (int j = 0; lines[i][j] != '\0'; j++)
-			{
-				if (lines[i][j] >= 'A' && lines[i][j] <= 'Z' && (j == 0 || lines[i][j - 1] == ' '||lines[i][j-1]=='*'))
-				{
-					count++;
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-					printf("%c", lines[i][j]);
-				}
-				else if (lines[i][j] == ' '||lines[i][j]=='*')
-				{
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-					printf("%c", lines[i][j]);
-				}
-				else
-				{
-					printf("%c", lines[i][j]);
-				}
-			}
-			printf(" %d개\n", count);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			printf("%s\n", lines[i]);
-		}
+		char temp = line[start];
+		line[start++] = line[end];
+		line[end--] = temp;
 	}
 }
-int main()
+
+void makeLine(int index, char* result)
+{
+	strcpy(result, lines[index]);
+	// 입력 순서와 관계없이 같은 순서로 켜진 기능을 적용한다.
+	for (int j = 0; result[j] != '\0'; j++)
+	{
+		if (isa)
+		{
+			if (result[j] >= 'A' && result[j] <= 'Z') result[j] += 32;
+			else if (result[j] >= 'a' && result[j] <= 'z') result[j] -= 32;
+		}
+		if (ise)
+		{
+			if (result[j] == ' ') result[j] = '*';
+			else if (result[j] == '*') result[j] = ' ';
+		}
+		if (isg && result[j] == change) result[j] = replacement;
+	}
+	int length = (int)strlen(result);
+	if (isf)
+	{
+		int start = 0;
+		for (int j = 0; j <= length; j++)
+		{
+			if (isSeparator(result[j]) || result[j] == '\0')
+			{
+				reverse(result, start, j - 1);
+				start = j + 1;
+			}
+		}
+	}
+	if (isd) reverse(result, 0, length - 1);
+}
+
+bool sameWord(const char* text, int length, const char* word)
+{
+	if ((int)strlen(word) != length) return false;
+	for (int i = 0; i < length; i++)
+		if (tolower((unsigned char)text[i]) != tolower((unsigned char)word[i]))
+			return false;
+	return true;
+}
+
+void print(bool countWords, const char* search)
+{
+	int matches = 0;
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	for (int i = 0; i < 10; i++)
+	{
+		char line[100];
+		makeLine(i, line);
+		int words = 0, capitals = 0;
+		bool highlight = false;
+		for (int j = 0; line[j] != '\0'; j++)
+		{
+			if (isSeparator(line[j])) highlight = false;
+			else if (j == 0 || isSeparator(line[j - 1]))
+			{
+				words++;
+				bool capital = line[j] >= 'A' && line[j] <= 'Z';
+				if (capital) capitals++;
+				highlight = isc && capital;
+				if (search != NULL)
+				{
+					int end = j;
+					while (line[end] != '\0' && !isSeparator(line[end])) end++;
+					if (sameWord(line + j, end - j, search))
+					{
+						matches++;
+						highlight = true;
+					}
+				}
+			}
+			SetConsoleTextAttribute(console, highlight ? 4 : 15);
+			printf("%c", line[j]);
+			if (ish && line[j] >= '0' && line[j] <= '9') printf("\n");
+		}
+		SetConsoleTextAttribute(console, 15);
+		if (isc) printf(" %d개", capitals);
+		if (countWords) printf(" 단어 %d개", words);
+		printf("\n");
+	}
+	if (search != NULL) printf("%s는 %d개입니다.\n", search, matches);
+}
+
+int main(void)
 {
 	openFile();
-	char command;
-	print();
+	print(false, NULL);
 	while (1)
 	{
+		char command, word[100];
 		printf("명령어를 입력하세요 : ");
-		scanf(" %c", &command);
-		if (command == 'a')
+		if (scanf(" %c", &command) != 1) break;
+		switch (command)
 		{
-			for (int i = 0;i < 10;i++)
+		case 'a': isa = !isa; break;
+		case 'c': isc = !isc; break;
+		case 'd': isd = !isd; break;
+		case 'e': ise = !ise; break;
+		case 'f': isf = !isf; break;
+		case 'g':
+			if (!isg)
 			{
-				for (int j = 0;lines[i][j] != '\0';j++)
-				{
-					if (lines[i][j] >= 'A' && lines[i][j] <= 'Z')
-					{
-						lines[i][j] += 32;
-					}
-					else if (lines[i][j] >= 'a' && lines[i][j] <= 'z')
-					{
-						lines[i][j] -= 32;
-					}
-				}
+				printf("바꿀 문자와 새 문자를 입력하세요 : ");
+				if (scanf(" %c %c", &change, &replacement) != 2) return 0;
 			}
-			print();
-		}
-		else if (command == 'b')
-		{
-			for (int i = 0;i < 10;i++)
-			{
-				int count = 0;
-				for (int j = 0;lines[i][j]!='\0';j++)
-				{
-					if (lines[i][j] != ' ' && (j == 0 || lines[i][j - 1] == ' '))
-					{
-						count++;
-					}
-					printf("%c", lines[i][j]);
-				}
-				printf(" %d개\n", count);
-			}
-		}
-		else if (command == 'c')
-		{
-			if (isc == false)
-			{
-				for (int i = 0; i < 10; i++)
-				{
-					int count = 0;
-					for (int j = 0; lines[i][j] != '\0'; j++)
-					{
-						if (lines[i][j] >= 'A' && lines[i][j] <= 'Z' && (j == 0 || lines[i][j - 1] == ' '))
-						{
-							count++;
-							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-							printf("%c", lines[i][j]);
-						}
-						else if (lines[i][j] == ' ')
-						{
-							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-							printf("%c", lines[i][j]);
-						}
-						else
-						{
-							printf("%c", lines[i][j]);
-						}
-					}
-					printf(" %d개\n", count);
-				}
-				isc = true;
-			}
-			else if (isc == true)
-			{
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-				isc = false;
-				print();
-			}
-			
-		}
-		else if (command == 'd')
-		{
-			if (isd == false)
-			{
-				for (int i = 0;i < 10;i++)
-				{
-					int count = 0;
-					for (int j = 0;lines[i][j] != '\0';j++)
-					{
-						count++;
-					}
-					for (int j = count;j > 0;j--)
-					{
-						printf("%c", lines[i][j]);
-					}
-					printf("\n");
-				}
-				isd = true;
-			}
-			else
-			{
-				print();
-				isd = false;
-			}
-		}
-		else if (command == 'e')
-		{
-			for (int i = 0;i < 10;i++)
-			{
-				for (int j = 0;lines[i][j] != '\0';j++)
-				{
-					if (lines[i][j] == ' ')
-						lines[i][j] = '*';
-					else if (lines[i][j] == '*')
-						lines[i][j] = ' ';
-				}
-			}
-			print();
-		}
-		else if (command == 'f')
-		{
-			if (isf == false)
-			{
-				for (int i = 0;i < 10;i++)
-				{
-					for (int j = 0;lines[i][j] != '\0'; j++)
-					{
-						int count = j;
-						while (lines[i][j] != ' ' && lines[i][j] != '*' && lines[i][j] != '\0')
-							j++;
-
-						for (int k = j - 1;k >= count;k--)
-							printf("%c", lines[i][k]);
-
-						if (lines[i][j] == ' ')
-							printf(" ");
-						else if (lines[i][j] == '*')
-							printf("*");
-					}
-					printf("\n");
-				}
-				isf = true;
-			}
-			else
-			{
-				print();
-				isf = false;
-			}
-		}
-		else if (command == 'g')
-		{
-			char change,word;
-			scanf(" %c %c", &change,&word);
-			for (int i = 0;i < 10;i++)
-			{
-				for (int j = 0;lines[i][j] != '\0';j++)
-				{
-					if (lines[i][j] == change)
-						lines[i][j] = word;
-				}
-			}
-			print();
-		}
-		else if (command == 'h')
-		{
-			if (ish == false)
-			{
-				for (int i = 0;i < 10;i++)
-				{
-					for (int j = 0;lines[i][j] != '\0';j++)
-					{
-						if (lines[i][j] >= '0' && lines[i][j] <= '9')
-							printf("%c\n", lines[i][j]);
-						else
-							printf("%c", lines[i][j]);
-					}
-					printf("\n");
-				}
-				ish = true;
-			}
-			else
-			{
-				ish = false;
-				print();
-			}
-			
-		}
-		else if (command == 'i')
-		{
-			char word[100];
-			int count = 0;
-
-			scanf(" %s", word);
-
-			for (int i = 0; i < 10; i++)
-			{
-				int start = 0;
-
-				for (int j = 0; ; j++)
-				{
-					if (lines[i][j] == ' ' || lines[i][j] == '\0')
-					{
-						int len = j - start;
-						int same = 1;
-
-						if (strlen(word) != len)
-						{
-							same = 0;
-						}
-						else
-						{
-							for (int k = 0; k < len; k++)
-							{
-								if (tolower(lines[i][start + k]) != tolower(word[k]))
-								{
-									same = 0;
-									break;
-								}
-							}
-						}
-
-						if (same == 1)
-						{
-							count++;
-							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-						}
-						else
-						{
-							SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-						}
-
-						for (int k = start; k < j; k++)
-							printf("%c", lines[i][k]);
-
-						SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-						if (lines[i][j] == ' ')
-							printf(" ");
-
-						if (lines[i][j] == '\0')
-							break;
-
-						start = j + 1;
-					}
-				}
-
-				printf("\n");
-			}
-
-			printf("%s는 %d개입니다.\n", word, count);
-		}
-		else if (command == 'j')
-		{
-			strcpy(temp, lines[9]);
-			for (int i = 8;i >= 0;i--)
-			{
-				strcpy(lines[i + 1], lines[i]);
-			}
-			strcpy(lines[0], temp);
-			print();
-		}
-		else if (command=='q')
+			isg = !isg;
 			break;
+		case 'h': ish = !ish; break;
+		case 'b': print(true, NULL); continue;
+		case 'i':
+			if (scanf(" %99s", word) != 1) return 0;
+			print(false, word);
+			continue;
+		case 'j':
+		{
+			char temp[100];
+			strcpy(temp, lines[9]);
+			for (int i = 8; i >= 0; i--) strcpy(lines[i + 1], lines[i]);
+			strcpy(lines[0], temp);
+			break;
+		}
+		case 'q': return 0;
+		default: continue;
+		}
+		print(false, NULL);
 	}
+	return 0;
 }
