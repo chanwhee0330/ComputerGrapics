@@ -1,4 +1,33 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿/*
+명령어 안내 (대소문자 구분, 입력 후 Enter)
+
+[도형 선택]
+1 : 도형 1 선택 (빨간색, 기본 선택)
+2 : 도형 2 선택 (파란색)
+
+[선택한 도형 이동]
+w / a / s / d : 위 / 왼쪽 / 아래 / 오른쪽으로 한 칸 이동
+                보드 경계를 넘으면 반대편으로 이어짐
+
+[선택한 도형 크기 변경]
+j / J : 가로와 세로를 각각 한 칸 축소 / 확대
+k / K : 가로를 한 칸 축소 / 확대
+l / L : 세로를 한 칸 축소 / 확대
+p     : 가로 한 칸 축소, 세로 한 칸 확대
+P     : 가로 한 칸 확대, 세로 한 칸 축소
+        크기는 각 방향으로 최소 1칸, 최대 보드 크기
+
+[보드 및 기타]
+b : 두 도형의 면적 출력
+c : 보드의 가로와 세로를 각각 한 칸 확대 (최대 40칸)
+v : 보드의 가로와 세로를 각각 한 칸 축소 (최소 20칸)
+    오른쪽 / 아래쪽 경계에 걸린 도형은 왼쪽 / 위쪽으로 한 칸 이동
+    두 도형 중 하나라도 축소한 보드에 들어가지 않으면 축소 불가
+r : 두 도형의 크기 다시 입력
+q : 프로그램 종료
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,7 +43,7 @@ typedef struct Row {
 
 Row row[40];
 
-void printboard(int x,int y)
+void printboard(int x, int y)
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 	system("cls");
@@ -24,12 +53,12 @@ void printboard(int x,int y)
 		{
 			if (row[i].col[j].board == 0)
 			{
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15*16 + 15);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15 * 16 + 15);
 				printf(". ");
 			}
 			else if (row[i].col[j].board == 1)
 			{
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4*16+4);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4 * 16 + 4);
 				printf("* ");
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15 * 16 + 15);
 			}
@@ -39,7 +68,7 @@ void printboard(int x,int y)
 				printf("* ");
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15 * 16 + 15);
 			}
-			else if(row[i].col[j].board==3)
+			else if (row[i].col[j].board == 3)
 			{
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5 * 16 + 5);
 				printf("* ");
@@ -61,6 +90,7 @@ int main()
 	scanf("%d %d", &p1x, &p1y);
 	printf("도형 2의 가로 세로를 입력하세요 : ");
 	scanf("%d %d", &p2x, &p2y);
+	int player = 1;
 	for (int i = 0; i < p1y; i++)
 	{
 		for (int j = 0; j < p1x; j++)
@@ -75,7 +105,7 @@ int main()
 			row[i].col[j].board += 2;
 		}
 	}
-	int p1posx=0, p1posy=0, p2posx=0, p2posy=0;
+	int p1posx = 0, p1posy = 0, p2posx = 0, p2posy = 0;
 	while (1)
 	{
 		printboard(x, y);
@@ -84,251 +114,531 @@ int main()
 		scanf(" %c", &command);
 		if (command == 'w')
 		{
-			for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
+			if (player == 1)
 			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
-				}
-			}
-			p1posy = (p1posy - 1+y) % y;
-			for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
-				}
-			}
-		}
-		else if (command == 'a')
-		{
-			for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
-				}
-			}
-			p1posx = (p1posx - 1 + x) % x;
-			for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
-				}
-			}
-		}
-		else if (command == 's')
-		{
-			for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
-				}
-			}
-			p1posy = (p1posy + 1) % y;
-			for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
-				}
-			}
-		}
-		else if (command == 'd')
-		{
-			for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy+i)%y].col[(p1posx+j)%x].board -= 1;
-				}
-			}
-			p1posx=(p1posx+1)%x;
-			for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
-			{
-				for (int j = 0; j < p1x; j++)
-				{
-					row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
-				}
-			}
-		}
-		else if (command == 'j') //모두 한칸 축소
-		{
-			if (p1x > 1 && p1y > 1)
-			{
-				for (int i = 0; i < p1y; i++)
+				for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
 				{
 					for (int j = 0; j < p1x; j++)
 					{
 						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
 					}
 				}
-				p1x--;
-				p1y--;
-				for (int i = 0; i < p1y; i++)
+				p1posy = (p1posy - 1 + y) % y;
+				for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
 				{
 					for (int j = 0; j < p1x; j++)
 					{
 						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+					}
+				}
+			}
+			else if (player == 2)
+			{
+				for (int i = 0; i < p2y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+					}
+				}
+				p2posy = (p2posy - 1 + y) % y;
+				for (int i = 0; i < p2y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+					}
+				}
+			}
+		}
+		else if (command == 'a')
+		{
+			if (player == 1)
+			{
+				for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+					}
+				}
+				p1posx = (p1posx - 1 + x) % x;
+				for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+					}
+				}
+			}
+			else if (player == 2)
+			{
+				for (int i = 0; i < p2y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+					}
+				}
+				p2posx = (p2posx - 1 + x) % x;
+				for (int i = 0; i < p2y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+					}
+				}
+			}
+		}
+		else if (command == 's')
+		{
+			if (player == 1)
+			{
+				for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+					}
+				}
+				p1posy = (p1posy + 1) % y;
+				for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+					}
+				}
+			}
+			else if (player == 2)
+			{
+				for (int i = 0; i < p2y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+					}
+				}
+				p2posy = (p2posy + 1) % y;
+				for (int i = 0; i < p2y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+					}
+				}
+			}
+		}
+		else if (command == 'd')
+		{
+			if (player == 1)
+			{
+				for (int i = 0; i < p1y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+					}
+				}
+				p1posx = (p1posx + 1) % x;
+				for (int i = 0; i < p1y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p1x; j++)
+					{
+						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+					}
+				}
+			}
+			else if (player == 2)
+			{
+				for (int i = 0; i < p2y; i++)   // 원래 있던거 원래대로
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+					}
+				}
+				p2posx = (p2posx + 1) % x;
+				for (int i = 0; i < p2y; i++) // 이동시킨후 다시 그리기 
+				{
+					for (int j = 0; j < p2x; j++)
+					{
+						row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+					}
+				}
+			}
+		}
+		else if (command == 'j') //모두 한칸 축소
+		{
+			if (player == 1)
+			{
+				if (p1x > 1 && p1y > 1)
+				{
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1x--;
+					p1y--;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
+					}
+				}
+			}
+			else if (player == 2)
+			{
+				if (p2x > 1 && p2y > 1)
+				{
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2x--;
+					p2y--;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'J')
 		{
-			if (p1x < x && p1y < y)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1x < x && p1y < y)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1x++;
+					p1y++;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1x++;
-				p1y++;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2x < x && p2y < y)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2x++;
+					p2y++;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'k') //x축 한칸 축소
 		{
-			if (p1x > 1)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1x > 1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1x--;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1x--;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2x > 1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2x--;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'K') //x축 한칸 확대
 		{
-			if (p1x < x)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1x < x)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1x++;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1x++;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2x < x)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2x++;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'l') //y축 한칸 축소
 		{
-			if (p1y > 1)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1y > 1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
 					}
-				}
-				p1y--;
-				for (int i = 0; i < p1y; i++)
-				{
-					for (int j = 0; j < p1x; j++)
+					p1y--;
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
 			}
+			else if (player == 2)
+			{
+				if (p2y > 1)
+				{
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2y--;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
+					}
+				}
 			}
+		}
 		else if (command == 'L') //y축 한칸 확대
 		{
-			if (p1y < y)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1y < y)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1y++;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1y++;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2y < y)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2y++;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'p') //x한칸 축소 y  한칸 확대
 		{
-			if (p1y < y&&p1x>1)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1y < y && p1x>1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1x--;
+					p1y++;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1x--;
-				p1y++;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2y < y && p2x>1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2x--;
+					p2y++;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'P') //x한칸 확대 y 한칸 축소
 		{
-			if (p1x < x && p1y>1)
+			if (player == 1)
 			{
-				for (int i = 0; i < p1y; i++)
+				if (p1x < x && p1y>1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p1y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board -= 1;
+						}
+					}
+					p1y--;
+					p1x++;
+					for (int i = 0; i < p1y; i++)
+					{
+						for (int j = 0; j < p1x; j++)
+						{
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						}
 					}
 				}
-				p1y--;
-				p1x++;
-				for (int i = 0; i < p1y; i++)
+			}
+			else if (player == 2)
+			{
+				if (p2x < x && p2y>1)
 				{
-					for (int j = 0; j < p1x; j++)
+					for (int i = 0; i < p2y; i++)
 					{
-						row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board -= 2;
+						}
+					}
+					p2y--;
+					p2x++;
+					for (int i = 0; i < p2y; i++)
+					{
+						for (int j = 0; j < p2x; j++)
+						{
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
+						}
 					}
 				}
 			}
 		}
 		else if (command == 'b')
 		{
-			printf("도형 1의 면적 : %d / 도형 2의 면적 : %d\n", p1x* p1y, p2x * p2y);
+			printf("도형 1의 면적 : %d / 도형 2의 면적 : %d\n", p1x * p1y, p2x * p2y);
 			Sleep(2500);
 		}
 		else if (command == 'c') //보드칸 x,y 1칸씩 늘리기
@@ -362,13 +672,16 @@ int main()
 		}
 		else if (command == 'v') //보드칸 x,y 1칸씩 줄이기
 		{
-			if (x > 20)
+			if (x > 20 && y > 20)
 			{
 				if (p1x < x && p1y < y && p2x < x && p2y < y)
 				{
+					if (p1posx + p1x >= x && p1posx > 0) p1posx--;
+					if (p1posy + p1y >= y && p1posy > 0) p1posy--;
+					if (p2posx + p2x >= x && p2posx > 0) p2posx--;
+					if (p2posy + p2y >= y && p2posy > 0) p2posy--;
 					x--;
 					y--;
-					p1posx = 0, p1posy = 0, p2posx = 0, p2posy = 0;
 					for (int i = 0; i < 40; i++)
 					{
 						for (int j = 0; j < 40; j++)
@@ -380,18 +693,55 @@ int main()
 					{
 						for (int j = 0; j < p1x; j++)
 						{
-							row[i].col[j].board += 1;
+							row[(p1posy + i) % y].col[(p1posx + j) % x].board += 1;
 						}
 					}
 					for (int i = 0; i < p2y; i++)
 					{
 						for (int j = 0; j < p2x; j++)
 						{
-							row[i].col[j].board += 2;
+							row[(p2posy + i) % y].col[(p2posx + j) % x].board += 2;
 						}
 					}
 				}
 			}
+		}
+		else if (command == 'r')
+		{
+			int x = 30, y = 30;
+			printboard(x, y);
+			printf("도형 1의 가로 세로를 입력하세요 : ");
+			int p1x, p1y, p2x, p2y;
+			scanf("%d %d", &p1x, &p1y);
+			printf("도형 2의 가로 세로를 입력하세요 : ");
+			scanf("%d %d", &p2x, &p2y);
+			for (int i = 0; i < p1y; i++)
+			{
+				for (int j = 0; j < p1x; j++)
+				{
+					row[i].col[j].board += 1;
+				}
+			}
+			for (int i = 0; i < p2y; i++)
+			{
+				for (int j = 0; j < p2x; j++)
+				{
+					row[i].col[j].board += 2;
+				}
+			}
+			p1posx = 0, p1posy = 0, p2posx = 0, p2posy = 0;
+		}
+		else if (command == 'q')
+		{
+			break;
+		}
+		else if (command == '1')
+		{
+			player = 1;
+		}
+		else if (command == '2')
+		{
+			player = 2;
 		}
 	}
 }

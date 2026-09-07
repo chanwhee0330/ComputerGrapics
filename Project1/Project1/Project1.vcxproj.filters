@@ -40,5 +40,8 @@
     <ClCompile Include="warmmingup5.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="warmmingup6.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
