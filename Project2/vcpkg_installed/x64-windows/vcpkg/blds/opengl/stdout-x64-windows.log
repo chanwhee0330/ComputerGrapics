@@ -1,0 +1,17 @@
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/include/GL/gl.h
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/include/GL/glu.h
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/lib/OpenGL32.Lib
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/lib/GlU32.Lib
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/debug/lib/OpenGL32.Lib
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/debug/lib/GlU32.Lib
+-- Fixing pkgconfig file: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/lib/pkgconfig/glu.pc
+-- Fixing pkgconfig file: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/lib/pkgconfig/opengl.pc
+Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.5.1-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.5.1-1-any.pkg.tar.zst
+Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.5.1-1-any.pkg.tar.zst
+Downloading msys2-msys2-runtime-3.6.5-1-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.6.5-1-x86_64.pkg.tar.zst
+Successfully downloaded msys2-msys2-runtime-3.6.5-1-x86_64.pkg.tar.zst
+-- Using msys root at C:/Users/chanw/AppData/Local/vcpkg/downloads/tools/msys2/3e71d1f8e22ab23f
+-- Fixing pkgconfig file: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/debug/lib/pkgconfig/glu.pc
+-- Fixing pkgconfig file: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/debug/lib/pkgconfig/opengl.pc
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl_x64-windows/share/opengl/usage
+-- Performing post-build validation

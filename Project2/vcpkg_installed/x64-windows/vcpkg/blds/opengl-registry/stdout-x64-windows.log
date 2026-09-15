@@ -1,0 +1,6 @@
+Downloading https://github.com/KhronosGroup/OpenGL-Registry/archive/e8f7cd0e35ac8d6f5667a021ff83d04b1fec41ef.tar.gz -> KhronosGroup-OpenGL-Registry-e8f7cd0e35ac8d6f5667a021ff83d04b1fec41ef.tar.gz
+Successfully downloaded KhronosGroup-OpenGL-Registry-e8f7cd0e35ac8d6f5667a021ff83d04b1fec41ef.tar.gz
+-- Extracting source C:/Users/chanw/AppData/Local/vcpkg/downloads/KhronosGroup-OpenGL-Registry-e8f7cd0e35ac8d6f5667a021ff83d04b1fec41ef.tar.gz
+-- Using source at C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/opengl-registry/src/4b1fec41ef-a126ad0aa2.clean
+-- Installing: C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/pkgs/opengl-registry_x64-windows/share/opengl-registry/copyright
+-- Performing post-build validation

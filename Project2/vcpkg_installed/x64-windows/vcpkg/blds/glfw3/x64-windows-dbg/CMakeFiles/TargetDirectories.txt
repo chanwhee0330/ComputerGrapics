@@ -1,0 +1,13 @@
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/uninstall.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/edit_cache.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/rebuild_cache.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/list_install_components.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/install.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/CMakeFiles/install/local.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/glfw.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/update_mappings.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/edit_cache.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/rebuild_cache.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/list_install_components.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/install.dir
+C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glfw3/x64-windows-dbg/src/CMakeFiles/install/local.dir
