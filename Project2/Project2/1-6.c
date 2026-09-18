@@ -9,10 +9,11 @@
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void MouseButtonCallback(GLFWwindow* window, int button, int acction, int mods);
 void GetCursorPose(GLFWwindow* window, double xpos, double ypos);
+void changeColor(int i);
 
 typedef struct Rect {
 	float x, y, sizex,sizey,r,g,b;
-	int move,color;
+	int move,color,random;
 	bool isAlive;
 }Rect;
 
@@ -121,15 +122,245 @@ int main(void)
 			{
 				if (block[i].isSelect == true)
 				{
-				
-					if (block[i].rect[j].move == 0)
+					if (block[i].rect[j].move == 0) // 위 아래로 이동
 					{
 						if (j >= 0 && j <= 1)
 						{
 							block[i].rect[j].y-=0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 0)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else if (j >= 2 && j <= 3)
+						{
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 2)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else if (j == 4 || j == 5)
+						{
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 4)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else
+						{
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 6)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+
+
+					}
+					else if (block[i].rect[j].move == 1) // 왼쪽 오른쪽으로 이동
+					{
+						if (j == 0 || j == 1)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 0)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+
+						}
+						else if (j == 2 || j == 3)
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 2)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else if (j == 4 || j == 5)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 4)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 6)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
 						}
 					}
+					else if (block[i].rect[j].move == 2) // 대각선으로 이동
+					{
+						if (j == 0 || j == 1)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 0)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+
+						}
+						else if (j == 2 || j == 3)
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 2)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else if (j == 4 || j == 5)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 4)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+						else
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+							if (j == 6)
+								block[i].rect[j].x += 0.0005f;
+							else
+								block[i].rect[j].x -= 0.0005f;
+						}
+					}
+					else if (block[i].rect[j].move == 3) // 왼쪽이동
+					{
+						block[i].rect[j].x -= 0.002f;
+						block[i].rect[j].sizex -= 0.0005f;
+						block[i].rect[j].sizey -= 0.0005f;
+						if (j % 2 == 0)
+							block[i].rect[j].x += 0.0005f;
+						else
+							block[i].rect[j].x -= 0.0005f;
+					}
+					else if (block[i].rect[j].move == 4) // 오른쪽이동
+					{
+						block[i].rect[j].x += 0.002f;
+						block[i].rect[j].sizex -= 0.0005f;
+						block[i].rect[j].sizey -= 0.0005f;
+						if (j % 2 == 0)
+							block[i].rect[j].x += 0.0005f;
+						else
+							block[i].rect[j].x -= 0.0005f;
+					}
+					else if (block[i].rect[j].move == 5) // 위 이동
+					{
+						block[i].rect[j].y += 0.002f;
+						block[i].rect[j].sizex -= 0.0005f;
+						block[i].rect[j].sizey -= 0.0005f;
+						if (j % 2 == 0)
+							block[i].rect[j].x += 0.0005f;
+						else
+							block[i].rect[j].x -= 0.0005f;
+					}
+					else if (block[i].rect[j].move == 6) // 아래 이동
+					{
+						block[i].rect[j].y -= 0.002f;
+						block[i].rect[j].sizex -= 0.0005f;
+						block[i].rect[j].sizey -= 0.0005f;
+						if (j % 2 == 0)
+							block[i].rect[j].x += 0.0005f;
+						else
+							block[i].rect[j].x -= 0.0005f;
+					}
+					else // 8조각 
+					{
+						if (block[i].rect[j].random == 0)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 1)
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 2)
+						{
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 3)
+						{
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 4)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 5)
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 6)
+						{
+							block[i].rect[j].x += 0.002f;
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						else if (block[i].rect[j].random == 7)
+						{
+							block[i].rect[j].x -= 0.002f;
+							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].sizex -= 0.0005f;
+							block[i].rect[j].sizey -= 0.0005f;
+						}
+						
+					}
+
+					if (block[i].rect[j].sizex <= 0||block[i].rect[j].sizey<=0)
+						block[i].rect[j].isAlive = false;
+					changeColor(i);
 				}
+
 
 				if (block[i].rect[j].isAlive == true)
 				{
@@ -184,10 +415,25 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 				if (x >= block[i].rect[j].x - block[i].rect[j].sizex && x <= block[i].rect[j].x + block[i].rect[j].sizex && y >= block[i].rect[j].y - block[i].rect[j].sizey && y <= block[i].rect[j].y + block[i].rect[j].sizey)
 				{
 					block[i].isSelect = true;
-					int move = rand() % 4;
-					for (int j = 0; j < 8; j++)
+					int move = rand() % 8;
+					if (move <= 6)
 					{
-						block[i].rect[j].move = move;
+						for (int j = 0;j < 8;j+=2)
+						{
+							block[i].rect[j].move = move;
+							block[i].rect[j].color = rand() % 2;
+							block[i].rect[j+1].move = move;
+							block[i].rect[j + 1].color = block[i].rect[j].color;
+						}
+					}
+					else
+					{
+						for (int j = 0; j < 8; j++)
+						{
+							block[i].rect[j].move = move;
+							block[i].rect[j].color = rand() % 2;
+							block[i].rect[j].random = rand() % 8;
+						}
 					}
 				}
 			}
@@ -209,4 +455,38 @@ void GetCursorPose(GLFWwindow* window, double xpos, double ypos)
 	{
 
 	}
+}
+
+
+void changeColor(int i)
+{
+		for (int j = 0;j < 8;j++)
+		{
+			if (block[i].rect[j].color == 0)
+			{
+				block[i].rect[j].r += 0.00125f;
+				block[i].rect[j].g += 0.00125f;
+				block[i].rect[j].b += 0.00125f;
+
+				if (block[i].rect[j].r >= 1.0f)
+					block[i].rect[j].r = 1.0f;
+				if (block[i].rect[j].g >= 1.0f)
+					block[i].rect[j].g = 1.0f;
+				if (block[i].rect[j].b >= 1.0f)
+					block[i].rect[j].b = 1.0f;
+			}
+			else
+			{
+				block[i].rect[j].r -= 0.00125f;
+				block[i].rect[j].g -= 0.00125f;
+				block[i].rect[j].b -= 0.00125f;
+
+				if (block[i].rect[j].r <= 0.0f)
+					block[i].rect[j].r = 0.0f;
+				if (block[i].rect[j].g <= 0.0f)
+					block[i].rect[j].g = 0.0f;
+				if (block[i].rect[j].b <= 0.0f)
+					block[i].rect[j].b = 0.0f;
+			}
+		}
 }
