@@ -1,2 +1,13 @@
 # Visual Studio local cache
 .vs/
+
+# Visual Studio build outputs
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+*.user
+*.suo
+
+# vcpkg generated dependencies
+**/vcpkg_installed/

@@ -1,8 +1,0 @@
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/glew.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/glew_s.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/uninstall.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/edit_cache.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/rebuild_cache.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/list_install_components.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/install.dir
-C:/Users/chanw/OneDrive/Desktop/과제/2학년/컴퓨터 그래픽스/Project2/vcpkg_installed/x64-windows/vcpkg/blds/glew/x64-windows-dbg/CMakeFiles/install/local.dir
