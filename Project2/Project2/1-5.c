@@ -153,7 +153,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			rect[i].g = (float)rand() / RAND_MAX;
 			rect[i].b = (float)rand() / RAND_MAX;
 		}
-		size = 0.05f;
 		eraser.size = size;
 		eraser.r = 0.0f;
 		eraser.g = 0.0f;
@@ -187,7 +186,7 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 			rect[rectCount].g = (float)rand() / RAND_MAX;
 			rect[rectCount].b = (float)rand() / RAND_MAX;
 			rectCount++;
-			size -= 0.01f;
+			size -= 0.004f;
 		}
 		createCount++;
 	}
