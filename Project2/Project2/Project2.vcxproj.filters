@@ -36,5 +36,23 @@
     <ClCompile Include="1-6.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="1-7.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="basiccode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="1-8.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="1-9.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment.glsl" />
+    <None Include="vertex.glsl" />
+    <None Include="vertex1.glsl" />
+    <None Include="vertex2.glsl" />
   </ItemGroup>
 </Project>
