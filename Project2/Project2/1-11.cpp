@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <GL/glew.h>
 #include <GL/glfw3.h>
 
@@ -10,25 +11,40 @@
 #include <sstream>
 #include <string>
 
-//--- ì½œë°± í•¨ìˆ˜
+//--- Äİ¹é ÇÔ¼ö
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void GetCursorPose(GLFWwindow* window, double xpos, double ypos);
 
-//--- ì…°ì´ë” ê´€ë ¨ í•¨ìˆ˜
+//--- ¼ÎÀÌ´õ °ü·Ã ÇÔ¼ö
 std::string filetobuf(const char* filePath);
 void make_vertexShaders();
 void make_fragmentShaders();
 GLuint make_shaderProgram();
 GLvoid drawScene();
 
-//--- í•„ìš”í•œ ë³€ìˆ˜ ì„ ì–¸
+//--- ÇÊ¿äÇÑ º¯¼ö ¼±¾ğ
 GLint width, height;
 GLuint shaderProgramID;
 GLuint vertexShader;
 GLuint fragmentShader;
 GLuint VAO;
 
+int winrow, wincol,px,py;
+float speed=1.0f;
+double lastMove=0;
+
+typedef struct Col {
+	float x, y, r, g, b,scalex,scaley,obr,obg,obb,obsize,pr,pg,pb,psize;
+	bool isPassed,isPlayer,iscollision;
+	int isObstacle,playerType;
+}Col;
+
+typedef struct Row {
+	Col col[30];
+}Row;
+
+Row row[30];
 int main(void)
 {
 	srand((unsigned int)time(NULL));
@@ -39,19 +55,66 @@ int main(void)
 	width = 1200;
 	height = 1200;
 
-	//--- GLFW ì´ˆê¸°í™”
+	//--- GLFW ÃÊ±âÈ­
 	if (glfwInit() != GLFW_TRUE)
 	{
 		printf("GLFW initialization failed.\n");
 		return EXIT_FAILURE;
 	}
 
-	//--- OpenGL ë²„ì „ ì„¤ì •
+	//--- OpenGL ¹öÀü ¼³Á¤
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	//--- ìœˆë„ìš° ìƒì„±
+	printf("°¡·Î ±æÀÌ¸¦ ÀÔ·ÂÇÏ¼¼¿ä ( 10 ~ 30 ) : ");
+	scanf("%d", &wincol);
+	printf("¼¼·Î ±æÀÌ¸¦ ÀÔ·ÂÇÏ¼¼¿ä ( 10 ~ 30 ) : ");
+	scanf("%d", &winrow);
+	width = wincol * 40;
+	height = winrow * 40;
+
+	for (int i = 0;i < winrow;i++)
+	{
+		for (int j = 0;j < wincol;j++)
+		{
+			int random = rand() % 10;
+			row[i].col[j].x = -1.0f + (j + 0.5f) * (2.0f / wincol);
+			row[i].col[j].y = 1.0f - (i + 0.5f) * (2.0f / winrow);
+
+			row[i].col[j].scalex = 2.0f/wincol;
+			row[i].col[j].scaley = 2.0f/winrow;
+
+			row[i].col[j].r = 0.0f;
+			row[i].col[j].g = 0.0f;
+			row[i].col[j].b = 0.0f;
+
+			row[i].col[j].obr = (float)rand() / RAND_MAX;
+			row[i].col[j].obg = (float)rand() / RAND_MAX;
+			row[i].col[j].obb = (float)rand() / RAND_MAX;
+
+			row[i].col[j].pr = (float)rand() / RAND_MAX;
+			row[i].col[j].pg = (float)rand() / RAND_MAX;
+			row[i].col[j].pb = (float)rand() / RAND_MAX;
+
+			row[i].col[j].obsize = 0.5f + (float)rand() / RAND_MAX * 0.3f;
+
+			if (random == 0)
+				row[i].col[j].isObstacle = 1;
+			else if (random == 1)
+				row[i].col[j].isObstacle = 2;
+			else if (random == 2)
+				row[i].col[j].isObstacle = 3;
+			else
+				row[i].col[j].isObstacle = 0;
+		}
+	}
+
+	row[0].col[0].isPlayer = true;
+	row[0].col[0].playerType = 1;
+	row[0].col[0].psize = 0.8f;
+	row[0].col[0].isObstacle = 0;
+	//--- À©µµ¿ì »ı¼º
 	window = glfwCreateWindow(width, height, "OpenGL Basic Window (C++)", NULL, NULL);
 	if (window == NULL)
 	{
@@ -62,11 +125,11 @@ int main(void)
 
 	glfwSetWindowPos(window, 20, 50);
 
-	//--- OpenGL ì»¨í…ìŠ¤íŠ¸ ì„¤ì •
+	//--- OpenGL ÄÁÅØ½ºÆ® ¼³Á¤
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
-	//--- GLEW ì´ˆê¸°í™”
+	//--- GLEW ÃÊ±âÈ­
 	glewExperimental = GL_TRUE;
 	glewResult = glewInit();
 	if (glewResult != GLEW_OK)
@@ -78,41 +141,41 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	//--- ì½œë°± í•¨ìˆ˜ ë“±ë¡
+	//--- Äİ¹é ÇÔ¼ö µî·Ï
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, MouseButtonCallback);
 	glfwSetCursorPosCallback(window, GetCursorPose);
 
-	//--- ë·°í¬íŠ¸ ì„¤ì •
+	//--- ºäÆ÷Æ® ¼³Á¤
 	glViewport(0, 0, width, height);
 
-	//--- VAO ìƒì„± ë° ë°”ì¸ë”©
+	//--- VAO »ı¼º ¹× ¹ÙÀÎµù
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	//--- ì„¸ì´ë” ì½ì–´ì™€ì„œ ì„¸ì´ë” í”„ë¡œê·¸ë¨ ë§Œë“¤ê¸°
+	//--- ¼¼ÀÌ´õ ÀĞ¾î¿Í¼­ ¼¼ÀÌ´õ ÇÁ·Î±×·¥ ¸¸µé±â
 	make_vertexShaders();
 	make_fragmentShaders();
 	shaderProgramID = make_shaderProgram();
 
-	//--- ë©”ì¸ ë£¨í”„
+	//--- ¸ŞÀÎ ·çÇÁ
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
 	{
-		//--- í™”ë©´ ì¶œë ¥
+		//--- È­¸é Ãâ·Â
 		drawScene();
 
-		//--- Q í‚¤ë¥¼ ëˆ„ë¥´ë©´ ì¢…ë£Œ
+		//--- Q Å°¸¦ ´©¸£¸é Á¾·á
 		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 		}
 
-		//--- ë²„í¼ êµì²´ ë° ì´ë²¤íŠ¸ ì²˜ë¦¬
+		//--- ¹öÆÛ ±³Ã¼ ¹× ÀÌº¥Æ® Ã³¸®
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	//--- ì¢…ë£Œ ì²˜ë¦¬
+	//--- Á¾·á Ã³¸®
 	glDeleteProgram(shaderProgramID);
 	glDeleteVertexArrays(1, &VAO);
 	glfwDestroyWindow(window);
@@ -121,121 +184,246 @@ int main(void)
 	return EXIT_SUCCESS;
 }
 
-//--- ë²„í…ìŠ¤ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
+//--- ¹öÅØ½º ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
 void make_vertexShaders()
 {
-	//--- ì„¸ì´ë” ì½”ë“œ ì½ì–´ì˜¤ê¸°
+	//--- ¼¼ÀÌ´õ ÄÚµå ÀĞ¾î¿À±â
 	std::string vertexSource = filetobuf("vertex4.glsl");
 	const char* source = vertexSource.c_str();
 
-	//--- ì„¸ì´ë” ìƒì„±í•˜ê¸°
+	//--- ¼¼ÀÌ´õ »ı¼ºÇÏ±â
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-	//--- ì„¸ì´ë”ì— ì½”ë“œ ì—°ê²°í•˜ê³  ì»´íŒŒì¼ í•˜ê¸°
+	//--- ¼¼ÀÌ´õ¿¡ ÄÚµå ¿¬°áÇÏ°í ÄÄÆÄÀÏ ÇÏ±â
 	glShaderSource(vertexShader, 1, &source, NULL);
 	glCompileShader(vertexShader);
 
 	GLint result;
 	GLchar errorLog[512];
 
-	//--- ì—ëŸ¬ ì²´í¬í•˜ê¸°
+	//--- ¿¡·¯ Ã¼Å©ÇÏ±â
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: vertex shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << std::endl;
+		std::cerr << "ERROR: vertex shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << std::endl;
 		return;
 	}
 }
 
-//--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
+//--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
 void make_fragmentShaders()
 {
-	//--- ì„¸ì´ë” ì½”ë“œ ì½ì–´ì˜¤ê¸°
+	//--- ¼¼ÀÌ´õ ÄÚµå ÀĞ¾î¿À±â
 	std::string fragmentSource = filetobuf("fragment.glsl");
 	const char* source = fragmentSource.c_str();
 
-	//--- ì„¸ì´ë” ìƒì„±í•˜ê¸°
+	//--- ¼¼ÀÌ´õ »ı¼ºÇÏ±â
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	//--- ì„¸ì´ë”ì— ì½”ë“œ ì—°ê²°í•˜ê³  ì»´íŒŒì¼ í•˜ê¸°
+	//--- ¼¼ÀÌ´õ¿¡ ÄÚµå ¿¬°áÇÏ°í ÄÄÆÄÀÏ ÇÏ±â
 	glShaderSource(fragmentShader, 1, &source, NULL);
 	glCompileShader(fragmentShader);
 
 	GLint result;
 	GLchar errorLog[512];
 
-	//--- ì—ëŸ¬ ì²´í¬í•˜ê¸°
+	//--- ¿¡·¯ Ã¼Å©ÇÏ±â
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: fragment shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << std::endl;
+		std::cerr << "ERROR: fragment shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << std::endl;
 		return;
 	}
 }
 
-//--- ì„¸ì´ë” í”„ë¡œê·¸ë¨ ë§Œë“¤ê³  ì„¸ì´ë” ê°ì²´ ë§í¬í•˜ê¸°
+//--- ¼¼ÀÌ´õ ÇÁ·Î±×·¥ ¸¸µé°í ¼¼ÀÌ´õ °´Ã¼ ¸µÅ©ÇÏ±â
 GLuint make_shaderProgram()
 {
 	GLint result;
 	GLchar errorLog[512];
 
-	//--- ì„¸ì´ë” í”„ë¡œê·¸ë¨ ìƒì„±
+	//--- ¼¼ÀÌ´õ ÇÁ·Î±×·¥ »ı¼º
 	GLuint shaderID = glCreateProgram();
 
-	//--- ë²„í…ìŠ¤ ì„¸ì´ë”ì™€ í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ì—°ê²°
+	//--- ¹öÅØ½º ¼¼ÀÌ´õ¿Í ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ ¿¬°á
 	glAttachShader(shaderID, vertexShader);
 	glAttachShader(shaderID, fragmentShader);
 
-	//--- ì„¸ì´ë” í”„ë¡œê·¸ë¨ ë§í¬
+	//--- ¼¼ÀÌ´õ ÇÁ·Î±×·¥ ¸µÅ©
 	glLinkProgram(shaderID);
 
-	//--- ë§í¬ê°€ ëë‚¬ìœ¼ë¯€ë¡œ ì„¸ì´ë” ê°ì²´ ì‚­ì œ
+	//--- ¸µÅ©°¡ ³¡³µÀ¸¹Ç·Î ¼¼ÀÌ´õ °´Ã¼ »èÁ¦
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	//--- ë§í¬ ì„±ê³µ ì—¬ë¶€ í™•ì¸
+	//--- ¸µÅ© ¼º°ø ¿©ºÎ È®ÀÎ
 	glGetProgramiv(shaderID, GL_LINK_STATUS, &result);
 	if (!result)
 	{
 		glGetProgramInfoLog(shaderID, 512, NULL, errorLog);
-		std::cerr << "ERROR: shader program ì—°ê²° ì‹¤íŒ¨\n" << errorLog << std::endl;
+		std::cerr << "ERROR: shader program ¿¬°á ½ÇÆĞ\n" << errorLog << std::endl;
 		return 0;
 	}
 
-	//--- ì„¸ì´ë” í”„ë¡œê·¸ë¨ ì‚¬ìš©
+	//--- ¼¼ÀÌ´õ ÇÁ·Î±×·¥ »ç¿ë
 	glUseProgram(shaderID);
 	return shaderID;
 }
 
-//--- ì¶œë ¥ í•¨ìˆ˜
+//--- Ãâ·Â ÇÔ¼ö
 GLvoid drawScene()
 {
-	//--- í°ìƒ‰ ë°°ê²½ìœ¼ë¡œ í™”ë©´ ì§€ìš°ê¸°
+	//--- Èò»ö ¹è°æÀ¸·Î È­¸é Áö¿ì±â
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//--- ì…°ì´ë” í”„ë¡œê·¸ë¨ ì‚¬ìš©
+	//--- ¼ÎÀÌ´õ ÇÁ·Î±×·¥ »ç¿ë
 	glUseProgram(shaderProgramID);
 
 	GLint offsetLocation = glGetUniformLocation(shaderProgramID, "offset");
 	GLint scaleLocation = glGetUniformLocation(shaderProgramID, "scale");
 	GLint colorLocation = glGetUniformLocation(shaderProgramID, "vColor");
 
-	//--- ì´ ì•„ë˜ì— í•„ìš”í•œ ê·¸ë¦¬ê¸° ê¸°ëŠ¥ì„ ì¶”ê°€
+	//--- ÀÌ ¾Æ·¡¿¡ ÇÊ¿äÇÑ ±×¸®±â ±â´ÉÀ» Ãß°¡
+	for (int i = 0;i < winrow;i++)
+	{
+		for (int j = 0;j < wincol;j++)
+		{
+			if (row[i].col[j].iscollision == false)
+			{
+				glUniform2f(offsetLocation, row[i].col[j].x, row[i].col[j].y);
+				glUniform2f(scaleLocation, row[i].col[j].scalex, row[i].col[j].scaley);
+				glUniform4f(colorLocation, row[i].col[j].r, row[i].col[j].g, row[i].col[j].b, 1.0f);
+				glDrawArrays(GL_LINE_LOOP, 0, 4);
+			}
+			else
+			{
+				glUniform2f(offsetLocation, row[i].col[j].x, row[i].col[j].y);
+				glUniform2f(scaleLocation, row[i].col[j].scalex, row[i].col[j].scaley);
+				glUniform4f(colorLocation, 1.0f, 0, 0, 1.0f);
+				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+			}
+
+
+			if (row[i].col[j].isObstacle == 1)
+			{
+				glUniform2f(scaleLocation, row[i].col[j].scalex * row[i].col[j].obsize, row[i].col[j].scaley * row[i].col[j].obsize);
+				glUniform4f(colorLocation, row[i].col[j].obr, row[i].col[j].obg, row[i].col[j].obb, 1.0f);
+				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+			}
+			else if (row[i].col[j].isObstacle == 2)
+			{
+				glUniform2f(scaleLocation, row[i].col[j].scalex * row[i].col[j].obsize, row[i].col[j].scaley * row[i].col[j].obsize);
+				glUniform4f(colorLocation, row[i].col[j].obr, row[i].col[j].obg, row[i].col[j].obb, 1.0f);
+				glDrawArrays(GL_TRIANGLES, 4, 3);
+			}
+			else if (row[i].col[j].isObstacle == 3)
+			{
+				glUniform2f(scaleLocation, row[i].col[j].scalex * row[i].col[j].obsize, row[i].col[j].scaley * row[i].col[j].obsize);
+				glUniform4f(colorLocation, row[i].col[j].obr, row[i].col[j].obg, row[i].col[j].obb, 1.0f);
+				glDrawArrays(GL_TRIANGLES, 7, 3);
+			}
+
+			if (row[i].col[j].isPlayer)
+			{
+				glUniform2f(scaleLocation, row[i].col[j].scalex * row[i].col[j].psize, row[i].col[j].scaley * row[i].col[j].psize);
+				glUniform4f(colorLocation, row[i].col[j].pr, row[i].col[j].pg, row[i].col[j].pb, 1.0f);
+				if (row[i].col[j].playerType == 1)
+					glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+				else if (row[i].col[j].playerType == 2)
+					glDrawArrays(GL_TRIANGLES, 4, 3);
+				else if (row[i].col[j].playerType == 3)
+					glDrawArrays(GL_TRIANGLES, 7, 3);
+			}
+		}
+	}
+
+	double now = glfwGetTime();
+	if (now - lastMove > speed)
+	{
+		int nextX = px;
+		int nextY = py;
+
+		if (py % 2 == 0 && px < wincol - 1)
+			nextX++;
+		else if (py % 2 == 1 && px > 0)
+			nextX--;
+		else if (py < winrow - 1)
+			nextY++;
+
+		if (nextX != px || nextY != py)
+		{
+			for (int i = 0; i < winrow; i++)
+			{
+				for (int j = 0; j < wincol; j++)
+				{
+					if (i == py && j == px)
+					{
+						row[nextY].col[nextX].psize = row[i].col[j].psize;
+						row[nextY].col[nextX].pr = row[i].col[j].pr;
+						row[nextY].col[nextX].pg = row[i].col[j].pg;
+						row[nextY].col[nextX].pb = row[i].col[j].pb;
+						row[nextY].col[nextX].playerType = row[i].col[j].playerType;
+
+						row[i].col[j].isPlayer = false;
+						row[i].col[j].iscollision = false;
+						row[nextY].col[nextX].isPlayer = true;
+
+						if (row[nextY].col[nextX].isObstacle != 0)
+						{
+							float tsize = row[nextY].col[nextX].psize;
+							float tr = row[nextY].col[nextX].pr;
+							float tg = row[nextY].col[nextX].pg;
+							float tb = row[nextY].col[nextX].pb;
+							int ttype = row[nextY].col[nextX].playerType;
+
+							row[nextY].col[nextX].psize = row[nextY].col[nextX].obsize;
+							row[nextY].col[nextX].pr = row[nextY].col[nextX].obr;
+							row[nextY].col[nextX].pg = row[nextY].col[nextX].obg;
+							row[nextY].col[nextX].pb = row[nextY].col[nextX].obb;
+							row[nextY].col[nextX].playerType = row[nextY].col[nextX].isObstacle;
+
+							row[nextY].col[nextX].obsize = tsize;
+							row[nextY].col[nextX].obr = tr;
+							row[nextY].col[nextX].obg = tg;
+							row[nextY].col[nextX].obb = tb;
+							row[nextY].col[nextX].isObstacle = ttype;
+
+							row[nextY].col[nextX].iscollision = true;
+						}
+					}
+				}
+			}
+			px = nextX;
+			py = nextY;
+		}
+		else
+		{
+			row[py].col[px].iscollision = false;
+		}
+		lastMove = now;
+	}
+
 }
 
-//--- í‚¤ë³´ë“œ ì…ë ¥ ì½œë°± í•¨ìˆ˜
+//--- Å°º¸µå ÀÔ·Â Äİ¹é ÇÔ¼ö
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	if ((key == GLFW_KEY_EQUAL && (mods & GLFW_MOD_SHIFT)) || key == GLFW_KEY_KP_ADD)
 	{
-
+		if (speed >= 0.2f)
+			speed -= 0.1f;
+	}
+	else if (key == GLFW_KEY_MINUS || key == GLFW_KEY_KP_SUBTRACT)
+	{
+		if (speed < 1.5f)
+			speed += 0.1f;
 	}
 }
 
-//--- ë§ˆìš°ìŠ¤ ë²„íŠ¼ ì…ë ¥ ì½œë°± í•¨ìˆ˜
+//--- ¸¶¿ì½º ¹öÆ° ÀÔ·Â Äİ¹é ÇÔ¼ö
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -252,7 +440,7 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
-//--- ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì…ë ¥ ì½œë°± í•¨ìˆ˜
+//--- ¸¶¿ì½º À§Ä¡ ÀÔ·Â Äİ¹é ÇÔ¼ö
 void GetCursorPose(GLFWwindow* window, double xpos, double ypos)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
@@ -261,7 +449,7 @@ void GetCursorPose(GLFWwindow* window, double xpos, double ypos)
 	}
 }
 
-//--- í…ìŠ¤íŠ¸ íŒŒì¼ì˜ ë‚´ìš©ì„ ë¬¸ìì—´ë¡œ ì½ì–´ì˜¤ëŠ” í•¨ìˆ˜
+//--- ÅØ½ºÆ® ÆÄÀÏÀÇ ³»¿ëÀ» ¹®ÀÚ¿­·Î ÀĞ¾î¿À´Â ÇÔ¼ö
 std::string filetobuf(const char* filePath)
 {
 	std::ifstream file(filePath);
