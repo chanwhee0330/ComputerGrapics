@@ -48,11 +48,19 @@
     <ClCompile Include="1-9.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="1-10.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="1-11.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
     <None Include="vertex.glsl" />
     <None Include="vertex1.glsl" />
     <None Include="vertex2.glsl" />
+    <None Include="vertex3.glsl" />
+    <None Include="vertex4.glsl" />
   </ItemGroup>
 </Project>

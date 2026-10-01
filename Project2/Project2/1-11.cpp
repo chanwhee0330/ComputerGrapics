@@ -9,7 +9,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cmath>
 
 //--- 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -29,20 +28,6 @@ GLuint shaderProgramID;
 GLuint vertexShader;
 GLuint fragmentShader;
 GLuint VAO;
-
-typedef struct Triangle {
-	GLfloat x, y, r, g, b, scale, angle, temp, radius;
-	GLint move, movetype;
-	bool isAlive;
-}Triangle;
-
-Triangle tri[4];
-
-int shapeCount;
-
-GLfloat pathX[4][5000];
-GLfloat pathY[4][5000];
-GLint pathCount[4];
 
 int main(void)
 {
@@ -140,7 +125,7 @@ int main(void)
 void make_vertexShaders()
 {
 	//--- 세이더 코드 읽어오기
-	std::string vertexSource = filetobuf("vertex2.glsl");
+	std::string vertexSource = filetobuf("vertex4.glsl");
 	const char* source = vertexSource.c_str();
 
 	//--- 세이더 생성하기
@@ -236,282 +221,17 @@ GLvoid drawScene()
 
 	GLint offsetLocation = glGetUniformLocation(shaderProgramID, "offset");
 	GLint scaleLocation = glGetUniformLocation(shaderProgramID, "scale");
-	GLint angleLocation = glGetUniformLocation(shaderProgramID, "angle");
 	GLint colorLocation = glGetUniformLocation(shaderProgramID, "vColor");
 
 	//--- 이 아래에 필요한 그리기 기능을 추가
-	for (int i = 0; i < shapeCount; i++)
-	{
-		glUniform2f(offsetLocation, tri[i].x, tri[i].y);
-		glUniform1f(scaleLocation, tri[i].scale);
-		glUniform1f(angleLocation, tri[i].angle);
-		glUniform4f(colorLocation, tri[i].r, tri[i].g, tri[i].b, 1.0f);
-		if (tri[i].isAlive)
-		{
-			glPointSize(3.0f);
-
-			glUniform1f(scaleLocation, 1.0f);
-			glUniform1f(angleLocation, 0.0f);
-
-			for (int j = 0; j < pathCount[i]; j++)
-			{
-				glUniform2f(offsetLocation, pathX[i][j], pathY[i][j]);
-				glDrawArrays(GL_POINTS, 3, 1);
-			}
-
-			glUniform2f(offsetLocation, tri[i].x, tri[i].y);
-			glUniform1f(scaleLocation, tri[i].scale);
-			glUniform1f(angleLocation, tri[i].angle);
-
-			glDrawArrays(GL_TRIANGLES, 0, 3);
-			if (tri[i].movetype == 1)
-			{
-				if (tri[i].move == 0)
-				{
-					tri[i].x += 0.002f;
-					tri[i].y -= 0.002f;
-					tri[i].angle = 225;
-				}
-				else if (tri[i].move == 1)
-				{
-					tri[i].x += 0.002f;
-					tri[i].y += 0.002f;
-					tri[i].angle = 315;
-				}
-				else if (tri[i].move == 2)
-				{
-					tri[i].x -= 0.002f;
-					tri[i].y += 0.002f;
-					tri[i].angle = 45;
-				}
-				else if (tri[i].move == 3)
-				{
-					tri[i].x -= 0.002f;
-					tri[i].y -= 0.002f;
-					tri[i].angle = 135;
-				}
-
-				if (tri[i].y <= -1.0f)
-					tri[i].move = 1;
-				else if (tri[i].y >= 1.0f)
-					tri[i].move = 3;
-				else if (tri[i].x < -1.0f)
-					tri[i].move = 0;
-				else if (tri[i].x > 1.0f)
-					tri[i].move = 2;
-				if (pathCount[i] < 5000)
-				{
-					pathX[i][pathCount[i]] = tri[i].x;
-					pathY[i][pathCount[i]] = tri[i].y;
-					pathCount[i]++;
-				}
-			}
-			else if (tri[i].movetype == 2)
-			{
-				if (tri[i].move % 4 == 0)
-				{
-					tri[i].x += 0.002f;
-					tri[i].angle = 270;
-				}
-				else if (tri[i].move % 4 == 1)
-				{
-					tri[i].y -= 0.002f;
-					tri[i].angle = 180;
-					tri[i].temp += 0.002f;
-				}
-				else if (tri[i].move % 4 == 2)
-				{
-					tri[i].x -= 0.002f;
-					tri[i].angle = 90;
-				}
-				else if (tri[i].move % 4 == 3)
-				{
-					tri[i].y -= 0.002f;
-					tri[i].angle = 180;
-					tri[i].temp += 0.002f;
-				}
-
-				if (tri[i].temp >= 0.1f)
-				{
-					tri[i].temp = 0;
-					tri[i].move++;
-
-					if (tri[i].move >= 4)
-						tri[i].move = 0;
-				}
-
-				if (tri[i].move % 4 == 0 && tri[i].x >= 1.0f)
-				{
-					tri[i].move = 1;
-				}
-				else if (tri[i].move % 4 == 2 && tri[i].x <= -1.0f)
-					tri[i].move = 3;
-
-				if (tri[i].y <= -1.0f)
-				{
-					tri[i].y = 0.9f;
-				}
-				if (pathCount[i] < 5000)
-				{
-					pathX[i][pathCount[i]] = tri[i].x;
-					pathY[i][pathCount[i]] = tri[i].y;
-					pathCount[i]++;
-				}
-			}
-			else if (tri[i].movetype == 3)
-			{
-				if (tri[i].move == 0)
-				{
-					tri[i].x += 0.0005f;
-					tri[i].y += 0.003f;
-					tri[i].angle = 350;
-				}
-				else if (tri[i].move == 1)
-				{
-					tri[i].x += 0.0005f;
-					tri[i].y -= 0.003f;
-					tri[i].angle = 190;
-				}
-				else if (tri[i].move == 2)
-				{
-					tri[i].x -= 0.0005f;
-					tri[i].y += 0.003f;
-					tri[i].angle = 10;
-				}
-				else if (tri[i].move == 3)
-				{
-					tri[i].x -= 0.0005f;
-					tri[i].y -= 0.003f;
-					tri[i].angle = 170;
-				}
-
-				if (tri[i].y >= 1.0f)
-				{
-					if (tri[i].move == 0)
-						tri[i].move = 1;
-					else if (tri[i].move == 2)
-						tri[i].move = 3;
-				}
-				else if (tri[i].y <= -1.0f)
-				{
-					if (tri[i].move == 1)
-						tri[i].move = 0;
-					else if (tri[i].move == 3)
-						tri[i].move = 2;
-				}
-
-				if (tri[i].x >= 1.0f)
-				{
-					if (tri[i].move == 0)
-						tri[i].move = 2;
-					else if (tri[i].move == 1)
-						tri[i].move = 3;
-				}
-				else if (tri[i].x <= -1.0f)
-				{
-					if (tri[i].move == 2)
-						tri[i].move = 0;
-					else if (tri[i].move == 3)
-						tri[i].move = 1;
-				}
-				if (pathCount[i] < 5000)
-				{
-					pathX[i][pathCount[i]] = tri[i].x;
-					pathY[i][pathCount[i]] = tri[i].y;
-					pathCount[i]++;
-				}
-			}
-			else if (tri[i].movetype == 4)
-			{
-				tri[i].temp += 2.0f;
-
-				// 바깥쪽으로 스파이럴
-				if (tri[i].move == 0)
-				{
-					tri[i].radius += 0.0005f;
-
-					if (tri[i].radius >= 0.8f)
-						tri[i].move = 1;
-				}
-				// 안쪽으로 스파이럴
-				else
-				{
-					tri[i].radius -= 0.0005f;
-
-					if (tri[i].radius <= 0.0f)
-						tri[i].move = 0;
-				}
-
-				GLfloat radian =
-					tri[i].temp * 3.141592f / 180.0f;
-
-				tri[i].x =
-					std::cos(radian) * tri[i].radius;
-
-				tri[i].y =
-					std::sin(radian) * tri[i].radius;
-
-				// 삼각형이 진행 방향을 바라보도록 설정
-				tri[i].angle = tri[i].temp;
-
-				if (pathCount[i] < 5000)
-				{
-					pathX[i][pathCount[i]] = tri[i].x;
-					pathY[i][pathCount[i]] = tri[i].y;
-					pathCount[i]++;
-				}
-			}
-		}
-	}
 }
 
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_A && action == GLFW_PRESS)
 	{
-		for (int i = 0; i < shapeCount; i++)
-		{
-			tri[i].movetype = 1;
-			pathCount[i] = 0;
-		}
-	}
 
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-	{
-		for (int i = 0; i < shapeCount; i++)
-		{
-			tri[i].movetype = 2;
-			tri[i].move = 0;
-			tri[i].temp = 0;
-			tri[i].angle = 270;
-			pathCount[i] = 0;
-		}
-	}
-
-	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-	{
-		for (int i = 0; i < shapeCount; i++)
-		{
-			tri[i].movetype = 3;
-			tri[i].move = 0;
-			tri[i].angle = 350;
-			pathCount[i] = 0;
-		}
-	}
-
-	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
-	{
-		for (int i = 0; i < shapeCount; i++)
-		{
-			tri[i].movetype = 4;
-			tri[i].move = 0;
-			tri[i].radius = 0.0f;
-			tri[i].temp = 0.0f;
-			tri[i].angle = 0.0f;
-			tri[i].x = tri[i].y = 0;
-			pathCount[i] = 0;
-		}
 	}
 }
 
@@ -520,32 +240,7 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		double mousex, mousey;
-		int windowx, windowy;
-		glfwGetCursorPos(window, &mousex, &mousey);
-		glfwGetWindowSize(window, &windowx, &windowy);
 
-		float x = -1.0f + 2.0f * (float)(mousex / windowx);
-		float y = 1.0f - 2.0f * (float)(mousey / windowy);
-
-		if (shapeCount < 4)
-		{
-			tri[shapeCount].x = x;
-			tri[shapeCount].y = y;
-
-			tri[shapeCount].r = (float)rand() / RAND_MAX;
-			tri[shapeCount].g = (float)rand() / RAND_MAX;
-			tri[shapeCount].b = (float)rand() / RAND_MAX;
-
-			tri[shapeCount].move = rand() % 4;
-			tri[shapeCount].movetype = 0;
-			tri[shapeCount].temp = 0;
-			tri[shapeCount].scale = 0.5f + (float)rand() / RAND_MAX * 0.5f;
-			tri[shapeCount].angle = 0;
-
-			tri[shapeCount].isAlive = true;
-			shapeCount++;
-		}
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{

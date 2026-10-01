@@ -136,7 +136,7 @@ int main(void)
 						}
 						else if (j >= 2 && j <= 3)
 						{
-							block[i].rect[j].y -= 0.002f;
+							block[i].rect[j].x += 0.002f;
 							block[i].rect[j].sizex -= 0.0005f;
 							block[i].rect[j].sizey -= 0.0005f;
 							if (j == 2)
@@ -146,7 +146,7 @@ int main(void)
 						}
 						else if (j == 4 || j == 5)
 						{
-							block[i].rect[j].y += 0.002f;
+							block[i].rect[j].x -= 0.002f;
 							block[i].rect[j].sizex -= 0.0005f;
 							block[i].rect[j].sizey -= 0.0005f;
 							if (j == 4)
@@ -415,7 +415,7 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 				if (x >= block[i].rect[j].x - block[i].rect[j].sizex && x <= block[i].rect[j].x + block[i].rect[j].sizex && y >= block[i].rect[j].y - block[i].rect[j].sizey && y <= block[i].rect[j].y + block[i].rect[j].sizey)
 				{
 					block[i].isSelect = true;
-					int move = rand() % 8;
+					int move = rand()%8;
 					if (move <= 6)
 					{
 						for (int j = 0;j < 8;j+=2)
