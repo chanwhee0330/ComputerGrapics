@@ -54,6 +54,9 @@
     <ClCompile Include="1-11.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="1-12.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
@@ -62,5 +65,6 @@
     <None Include="vertex2.glsl" />
     <None Include="vertex3.glsl" />
     <None Include="vertex4.glsl" />
+    <None Include="vertex5.glsl" />
   </ItemGroup>
 </Project>
