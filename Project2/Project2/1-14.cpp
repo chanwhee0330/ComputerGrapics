@@ -32,22 +32,74 @@ GLuint fragmentShader;
 GLuint VAO;
 GLuint VBO;
 
+bool ish = true;
+
 const GLfloat vertices[] = {
-	// 사각형 한 면: 삼각형 2개, 정점 6개
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.5f,  0.5f, 0.0f,
-	-0.5f, -0.5f, 0.0f,
-	 0.5f,  0.5f, 0.0f,
-	-0.5f,  0.5f, 0.0f,
+	// 앞면
+	-0.5f,-0.5f, 0.5f,  1,0,0,
+	 0.5f,-0.5f, 0.5f,  0,1,0,
+	 0.5f, 0.5f, 0.5f,  0,0,1,
 
-	// 선의 시작점과 끝점: 정점 6~7
-	-1.5f, 0.0f, 0.0f,
-	 1.5f, 0.0f, 0.0f,
+	-0.5f,-0.5f, 0.5f,  1,0,0,
+	 0.5f, 0.5f, 0.5f,  0,0,1,
+	-0.5f, 0.5f, 0.5f,  1,1,0,
 
-	 -0.5f,-0.5f,0.5f,
-	 0.5f,-0.5f,0.5f,
-	 0.0f,0.5f,0.0f
+	// 오른쪽 면
+	 0.5f,-0.5f, 0.5f,  0,1,0,
+	 0.5f,-0.5f,-0.5f,  0,1,1,
+	 0.5f, 0.5f,-0.5f,  1,1,1,
+
+	 0.5f,-0.5f, 0.5f,  0,1,0,
+	 0.5f, 0.5f,-0.5f,  1,1,1,
+	 0.5f, 0.5f, 0.5f,  0,0,1,
+
+	 // 뒷면
+	  0.5f,-0.5f,-0.5f,  0,1,1,
+	 -0.5f,-0.5f,-0.5f,  1,0,1,
+	 -0.5f, 0.5f,-0.5f,  1,0.5f,0,
+
+	  0.5f,-0.5f,-0.5f,  0,1,1,
+	 -0.5f, 0.5f,-0.5f,  1,0.5f,0,
+	  0.5f, 0.5f,-0.5f,  1,1,1,
+
+	  // 왼쪽 면
+	  -0.5f,-0.5f,-0.5f,  1,0,1,
+	  -0.5f,-0.5f, 0.5f,  1,0,0,
+	  -0.5f, 0.5f, 0.5f,  1,1,0,
+
+	  -0.5f,-0.5f,-0.5f,  1,0,1,
+	  -0.5f, 0.5f, 0.5f,  1,1,0,
+	  -0.5f, 0.5f,-0.5f,  1,0.5f,0,
+
+	  // 윗면
+	  -0.5f, 0.5f, 0.5f,  1,1,0,
+	   0.5f, 0.5f, 0.5f,  0,0,1,
+	   0.5f, 0.5f,-0.5f,  1,1,1,
+
+	  -0.5f, 0.5f, 0.5f,  1,1,0,
+	   0.5f, 0.5f,-0.5f,  1,1,1,
+	  -0.5f, 0.5f,-0.5f,  1,0.5f,0,
+
+	  // 아랫면
+	  -0.5f,-0.5f,-0.5f,  1,0,1,
+	   0.5f,-0.5f,-0.5f,  0,1,1,
+	   0.5f,-0.5f, 0.5f,  0,1,0,
+
+	  -0.5f,-0.5f,-0.5f,  1,0,1,
+	   0.5f,-0.5f, 0.5f,  0,1,0,
+	  -0.5f,-0.5f, 0.5f,  1,0,0,
+
+	  // X축: 빨강
+	  -1.5f,0.0f,0.0f,  1,0,0,
+	   1.5f,0.0f,0.0f,  1,0,0,
+
+	   // Y축: 초록
+	   0.0f,-1.5f,0.0f,  0,1,0,
+	   0.0f, 1.5f,0.0f,  0,1,0,
+
+	   // Z축: 파랑
+	   0.0f,0.0f,-1.5f,  0,0,1,
+	   0.0f,0.0f, 1.5f,  0,0,1
 };
 
 void InitBuffer();
@@ -119,6 +171,8 @@ int main(void)
 
 	InitBuffer();
 
+	glEnable(GL_DEPTH_TEST);
+		
 	//--- 메인 루프
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
 	{
@@ -150,7 +204,7 @@ int main(void)
 void make_vertexShaders()
 {
 	//--- 세이더 코드 읽어오기
-	std::string vertexSource = filetobuf("vertex6.glsl");
+	std::string vertexSource = filetobuf("vertex7.glsl");
 	const char* source = vertexSource.c_str();
 
 	//--- 세이더 생성하기
@@ -177,7 +231,7 @@ void make_vertexShaders()
 void make_fragmentShaders()
 {
 	//--- 세이더 코드 읽어오기
-	std::string fragmentSource = filetobuf("fragment.glsl");
+	std::string fragmentSource = filetobuf("fragment7.glsl");
 	const char* source = fragmentSource.c_str();
 
 	//--- 세이더 생성하기
@@ -239,7 +293,7 @@ GLvoid drawScene()
 {
 	// 1. 배경 지우기
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// 2. 사용할 셰이더와 정점 데이터 선택
 	glUseProgram(shaderProgramID);
@@ -258,36 +312,25 @@ GLvoid drawScene()
 	// transform: 면 배치 -> 정육면체 전체 회전 (오른쪽부터 적용)
 	glm::mat4 model(1.0f);
 	glm::mat4 transform(1.0f);
-
-	// 선: 단위 행렬로 원래 좌표 그대로 그리기
-	model = glm::mat4(1.0f);
+	
 	transform = cube * model;
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 1, 0, 0, 1);
-	glDrawArrays(GL_LINES, 6, 2);
 
-	model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 0, 1));
-	transform = cube * model;
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 0, 1, 0, 1);
-	glDrawArrays(GL_LINES, 6, 2);
-
-	model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1, 0));
-	transform = cube * model;
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 0, 0, 1, 1);
-	glDrawArrays(GL_LINES, 6, 2);
-
-
-
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_LINES, 36, 6);
 }
 
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-
+	if (key == GLFW_KEY_H && action == GLFW_PRESS)
+	{
+		ish = !ish;
+		if (ish)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
 }
 
 //--- 마우스 버튼 입력 콜백 함수
@@ -336,9 +379,11 @@ void InitBuffer()
 	// 좌표 배열을 GPU로 전달
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Location 0에서 정점마다 float 3개씩 읽도록 설정
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	// Location 0에서 정점마다 float 6개씩 읽도록 설정
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }

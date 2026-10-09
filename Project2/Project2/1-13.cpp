@@ -45,13 +45,18 @@ const GLfloat vertices[] = {
 
 	// 선의 시작점과 끝점: 정점 6~7
 	-1.5f, 0.0f, 0.0f,
-	 1.5f, 0.0f, 0.0f
+	 1.5f, 0.0f, 0.0f,
+
+	 -0.5f,-0.5f,0.5f,
+	 0.5f,-0.5f,0.5f,
+	 0.0f,0.5f,0.0f
 };
 
 void InitBuffer();
 
 int main(void)
 {
+	srand((unsigned int)time(NULL));
 	GLFWwindow* window;
 	GLenum glewResult;
 
@@ -348,6 +353,46 @@ GLvoid drawScene()
 		glUniform4f(colorLocation, 0.0f, 1.0f, 1.0f, 1.0f);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
+
+	if (is7)
+	{
+		model = glm::mat4(1.0f);
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glUniform4f(colorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 8, 3);
+	}
+
+	if (is8)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1, 0));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glUniform4f(colorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 8, 3);
+	}
+
+	if (is9)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 1, 0));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glUniform4f(colorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 8, 3);
+	}
+
+	if (is0)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0, 1, 0));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glUniform4f(colorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 8, 3);
+	}
+
 }
 
 //--- 키보드 입력 콜백 함수
@@ -394,6 +439,95 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			is6 = false;
 		else
 			is6 = true;
+	}
+	else if (key == GLFW_KEY_7 && action == GLFW_PRESS)
+	{
+		if (is7)
+			is7 = false;
+		else
+			is7 = true;
+	}
+	else if (key == GLFW_KEY_8 && action == GLFW_PRESS)
+	{
+		if (is8)
+			is8 = false;
+		else
+			is8 = true;
+	}
+	else if (key == GLFW_KEY_9 && action == GLFW_PRESS)
+	{
+		if (is9)
+			is9 = false;
+		else
+			is9 = true;
+	}
+	else if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+	{
+		if (is0)
+			is0 = false;
+		else
+			is0 = true;
+	}
+	else if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	{
+		is1 = false, is2 = false, is3 = false, is4 = false, is5 = false, is6 = false, is7 = false, is8 = false, is9 = false, is0 = false;
+		int a, b;
+		a = rand() % 6 + 1;
+		while (1)
+		{
+			b = rand() % 6 + 1;
+			if (a != b)
+				break;
+		}
+		if (a == 1 || b == 1)
+		{
+			is1 = true;
+		}
+		if (a == 2 || b == 2)
+		{
+			is2 = true;
+		}
+		if (a == 3 || b == 3)
+		{
+			is3 = true;
+		}
+		if (a == 4 || b == 4)
+		{
+			is4 = true;
+		}
+		if (a == 5 || b == 5)
+		{
+			is5 = true;
+		}
+		if (a == 6 || b == 6)
+		{
+			is6 = true;
+		}
+	}
+	else if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	{
+		int a = rand() % 4;
+		is1 = false, is2 = false, is3 = false, is4 = false, is5 = false, is6 = false, is7 = false, is8 = false, is9 = false, is0 = false;
+		if (a == 0)
+		{
+			is6 = true;
+			is7 = true;
+		}
+		else if (a == 1)
+		{
+			is6 = true;
+			is8 = true;
+		}
+		else if (a == 2)
+		{
+			is6 = true;
+			is9 = true;
+		}
+		else if (a == 3)
+		{
+			is6 = true;
+			is0 = true;
+		}
 	}
 }
 
