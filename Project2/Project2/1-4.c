@@ -14,7 +14,7 @@ typedef struct Rect{
 	float x, y, sizex, sizey, oldx, oldy, r, g, b, speedx, speedy,targetY;
 	int move;
 	bool is4, is5;
-	bool movex, movey, growing,movingdown;
+	bool radiX, radiY, growing,movingdown;
 }Rect;
 
 Rect rect[5];
@@ -86,30 +86,30 @@ int main(void)
 				
 				if (rect[i].x-rect[i].sizex < -1.0f)
 				{
-					rect[i].movex = true;
+					rect[i].radiX = true;
 				}
 				else if (rect[i].x+ rect[i].sizex > 1.0f)
 				{
-					rect[i].movex = false;
+					rect[i].radiX = false;
 				}
 
 				if (rect[i].y - rect[i].sizey < -1.0f)
 				{
-					rect[i].movey = true;
+					rect[i].radiY = true;
 				}
 				else if (rect[i].y + rect[i].sizey > 1.0f)
 				{
-					rect[i].movey = false;
+					rect[i].radiY = false;
 				}
 
-				if (rect[i].movex == true)
+				if (rect[i].radiX == true)
 					rect[i].x = rect[i].x + rect[i].speedx;
-				else if (rect[i].movex == false)
+				else if (rect[i].radiX == false)
 					rect[i].x = rect[i].x - rect[i].speedx;
 
-				if (rect[i].movey == true)
+				if (rect[i].radiY == true)
 					rect[i].y = rect[i].y + rect[i].speedy;
-				else if (rect[i].movey == false)
+				else if (rect[i].radiY == false)
 					rect[i].y = rect[i].y - rect[i].speedy;
 			}
 			else if (is2 == true)
@@ -123,13 +123,13 @@ int main(void)
 						rect[i].movingdown = false;
 					}
 				}
-				else if (rect[i].movex == true)
+				else if (rect[i].radiX == true)
 				{
 					rect[i].x += rect[i].speedx;
 					if (rect[i].x + rect[i].sizex >= 1.0f)
 					{
 						rect[i].x = 1.0f - rect[i].sizex;
-						rect[i].movex = false;
+						rect[i].radiX = false;
 
 						rect[i].targetY = rect[i].y - 0.05f;
 						rect[i].movingdown = true;
@@ -141,7 +141,7 @@ int main(void)
 					if (rect[i].x - rect[i].sizex <= -1.0f)
 					{
 						rect[i].x = -1.0f + rect[i].sizex;
-						rect[i].movex = true;
+						rect[i].radiX = true;
 
 						rect[i].targetY = rect[i].y - 0.05f;
 						rect[i].movingdown = true;
@@ -344,8 +344,8 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 			rect[rectCount].r = (float)rand() / RAND_MAX;
 			rect[rectCount].g = (float)rand() / RAND_MAX;
 			rect[rectCount].b = (float)rand() / RAND_MAX;
-			rect[rectCount].movex = true;
-			rect[rectCount].movey = false;
+			rect[rectCount].radiX = true;
+			rect[rectCount].radiY = false;
 			rect[rectCount].growing = true;
 			rect[rectCount].movingdown = false;
 			rect[rectCount].targetY = y;

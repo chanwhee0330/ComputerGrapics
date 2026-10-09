@@ -32,7 +32,9 @@ GLuint fragmentShader;
 GLuint VAO;
 GLuint VBO;
 
-bool ish = true;
+bool ish = true,isW,shape;
+int isX,radiX,isY,radiY;
+float moveX, moveY;
 
 const GLfloat vertices[] = {
 	// 앞면
@@ -99,7 +101,36 @@ const GLfloat vertices[] = {
 
 	   // Z축: 파랑
 	   0.0f,0.0f,-1.5f,  0,0,1,
-	   0.0f,0.0f, 1.5f,  0,0,1
+	   0.0f,0.0f, 1.5f,  0,0,1,
+
+	   // 앞면
+	- 0.5f, -0.5f,  0.5f,  1, 0, 0,
+	 0.5f, -0.5f,  0.5f,  1, 0, 0,
+	 0.0f,  0.5f,  0.0f,  1, 0, 0,
+
+	// 오른쪽 면
+	 0.5f, -0.5f,  0.5f,  0, 1, 0,
+	 0.5f, -0.5f, -0.5f,  0, 1, 0,
+	 0.0f,  0.5f,  0.0f,  0, 1, 0,
+
+	// 뒷면
+	 0.5f, -0.5f, -0.5f,  0, 0, 1,
+	-0.5f, -0.5f, -0.5f,  0, 0, 1,
+	 0.0f,  0.5f,  0.0f,  0, 0, 1,
+
+	// 왼쪽 면
+	-0.5f, -0.5f, -0.5f,  1, 1, 0,
+	-0.5f, -0.5f,  0.5f,  1, 1, 0,
+	 0.0f,  0.5f,  0.0f,  1, 1, 0,
+
+	// 밑면: 삼각형 2개
+	-0.5f, -0.5f,  0.5f,  1, 0, 1,
+	-0.5f, -0.5f, -0.5f,  1, 0, 1,
+	 0.5f, -0.5f, -0.5f,  1, 0, 1,
+
+	-0.5f, -0.5f,  0.5f,  1, 0, 1,
+	 0.5f, -0.5f, -0.5f,  1, 0, 1,
+	 0.5f, -0.5f,  0.5f,  1, 0, 1
 };
 
 void InitBuffer();
@@ -313,10 +344,47 @@ GLvoid drawScene()
 	glm::mat4 model(1.0f);
 	glm::mat4 transform(1.0f);
 	
+	if (isX == 1)
+	{
+		radiX += 1;
+		model = glm::rotate(model, glm::radians((float)radiX), glm::vec3(1, 0, 0));
+	}
+	else if (isX == 2)
+	{
+		radiX -= 1;
+		model = glm::rotate(model, glm::radians((float)radiX), glm::vec3(1, 0, 0));
+	}
+
+	if (isY == 1)
+	{
+		radiY += 1;
+		model = glm::rotate(model, glm::radians((float)radiY), glm::vec3(0, 1, 0));
+	}
+	else if (isY == 2)
+	{
+		radiY -= 1;
+		model = glm::rotate(model, glm::radians((float)radiY), glm::vec3(0, 1, 0));
+	}
+	model = glm::translate(model, glm::vec3(moveX,moveY,0));
 	transform = cube * model;
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	if (shape == false)
+	{
+		if (isW == false)
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		else
+			glDrawArrays(GL_LINE_LOOP, 0, 36);
+	}
+	else
+	{
+		if (isW == false)
+			glDrawArrays(GL_TRIANGLES, 42, 18);
+		else
+			glDrawArrays(GL_LINE_LOOP, 42, 18);
+	}
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(cube));
 	glDrawArrays(GL_LINES, 36, 6);
 }
 
@@ -330,6 +398,51 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			glEnable(GL_DEPTH_TEST);
 		else
 			glDisable(GL_DEPTH_TEST);
+	}
+	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		isW = !isW;
+	}
+	else if (key == GLFW_KEY_X && action == GLFW_PRESS)
+	{
+		isX++;
+		if (isX > 2)
+			isX = 0;
+	}
+	else if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+	{
+		isY++;
+		if (isY > 2)
+			isY = 0;
+	}
+	else if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	{
+		shape = false;
+	}
+	else if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		shape = true;
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		moveX = moveY = isY=isX=0;
+	}
+
+	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	{
+		moveX -= 0.1f;
+	}
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	{
+		moveX += 0.1f;
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		moveY -= 0.1f;
+	}
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		moveY += 0.1f;
 	}
 }
 
