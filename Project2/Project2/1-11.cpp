@@ -45,6 +45,7 @@ typedef struct Row {
 }Row;
 
 Row row[30];
+bool isS=false;
 int main(void)
 {
 	srand((unsigned int)time(NULL));
@@ -341,70 +342,74 @@ GLvoid drawScene()
 	}
 
 	double now = glfwGetTime();
-	if (now - lastMove > speed)
+	if (isS == false)
 	{
-		int nextX = px;
-		int nextY = py;
-
-		if (py % 2 == 0 && px < wincol - 1)
-			nextX++;
-		else if (py % 2 == 1 && px > 0)
-			nextX--;
-		else if (py < winrow - 1)
-			nextY++;
-
-		if (nextX != px || nextY != py)
+		if (now - lastMove > speed)
 		{
-			for (int i = 0; i < winrow; i++)
+			int nextX = px;
+			int nextY = py;
+
+			if (py % 2 == 0 && px < wincol - 1)
+				nextX++;
+			else if (py % 2 == 1 && px > 0)
+				nextX--;
+			else if (py < winrow - 1)
+				nextY++;
+
+			if (nextX != px || nextY != py)
 			{
-				for (int j = 0; j < wincol; j++)
+				for (int i = 0; i < winrow; i++)
 				{
-					if (i == py && j == px)
+					for (int j = 0; j < wincol; j++)
 					{
-						row[nextY].col[nextX].psize = row[i].col[j].psize;
-						row[nextY].col[nextX].pr = row[i].col[j].pr;
-						row[nextY].col[nextX].pg = row[i].col[j].pg;
-						row[nextY].col[nextX].pb = row[i].col[j].pb;
-						row[nextY].col[nextX].playerType = row[i].col[j].playerType;
-
-						row[i].col[j].isPlayer = false;
-						row[i].col[j].iscollision = false;
-						row[nextY].col[nextX].isPlayer = true;
-
-						if (row[nextY].col[nextX].isObstacle != 0)
+						if (i == py && j == px)
 						{
-							float tsize = row[nextY].col[nextX].psize;
-							float tr = row[nextY].col[nextX].pr;
-							float tg = row[nextY].col[nextX].pg;
-							float tb = row[nextY].col[nextX].pb;
-							int ttype = row[nextY].col[nextX].playerType;
+							row[nextY].col[nextX].psize = row[i].col[j].psize;
+							row[nextY].col[nextX].pr = row[i].col[j].pr;
+							row[nextY].col[nextX].pg = row[i].col[j].pg;
+							row[nextY].col[nextX].pb = row[i].col[j].pb;
+							row[nextY].col[nextX].playerType = row[i].col[j].playerType;
 
-							row[nextY].col[nextX].psize = row[nextY].col[nextX].obsize;
-							row[nextY].col[nextX].pr = row[nextY].col[nextX].obr;
-							row[nextY].col[nextX].pg = row[nextY].col[nextX].obg;
-							row[nextY].col[nextX].pb = row[nextY].col[nextX].obb;
-							row[nextY].col[nextX].playerType = row[nextY].col[nextX].isObstacle;
+							row[i].col[j].isPlayer = false;
+							row[i].col[j].iscollision = false;
+							row[nextY].col[nextX].isPlayer = true;
 
-							row[nextY].col[nextX].obsize = tsize;
-							row[nextY].col[nextX].obr = tr;
-							row[nextY].col[nextX].obg = tg;
-							row[nextY].col[nextX].obb = tb;
-							row[nextY].col[nextX].isObstacle = ttype;
+							if (row[nextY].col[nextX].isObstacle != 0)
+							{
+								float tsize = row[nextY].col[nextX].psize;
+								float tr = row[nextY].col[nextX].pr;
+								float tg = row[nextY].col[nextX].pg;
+								float tb = row[nextY].col[nextX].pb;
+								int ttype = row[nextY].col[nextX].playerType;
 
-							row[nextY].col[nextX].iscollision = true;
+								row[nextY].col[nextX].psize = row[nextY].col[nextX].obsize;
+								row[nextY].col[nextX].pr = row[nextY].col[nextX].obr;
+								row[nextY].col[nextX].pg = row[nextY].col[nextX].obg;
+								row[nextY].col[nextX].pb = row[nextY].col[nextX].obb;
+								row[nextY].col[nextX].playerType = row[nextY].col[nextX].isObstacle;
+
+								row[nextY].col[nextX].obsize = tsize;
+								row[nextY].col[nextX].obr = tr;
+								row[nextY].col[nextX].obg = tg;
+								row[nextY].col[nextX].obb = tb;
+								row[nextY].col[nextX].isObstacle = ttype;
+
+								row[nextY].col[nextX].iscollision = true;
+							}
 						}
 					}
 				}
+				px = nextX;
+				py = nextY;
 			}
-			px = nextX;
-			py = nextY;
+			else
+			{
+				row[py].col[px].iscollision = false;
+			}
+			lastMove = now;
 		}
-		else
-		{
-			row[py].col[px].iscollision = false;
-		}
-		lastMove = now;
 	}
+	
 
 }
 
@@ -420,6 +425,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	{
 		if (speed < 1.5f)
 			speed += 0.1f;
+	}
+
+	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		isS = !isS;
 	}
 }
 
