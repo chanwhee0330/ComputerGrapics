@@ -72,6 +72,10 @@ void free_model(Model* model);
 void make_model_vertices(const Model& model);
 void InitBuffer();
 
+int shape1, shape2,s1X,s2X,s1Y,s2Y,s1R,s2R,s1A,s2A,s1B,s2B;
+float s1x, s1y, s1z, s2x, s2y, s2z,r1x,r1y,r1z = 1.0f,r2x,r2y,r2z;
+bool is1, is2;
+
 int main(int argc, char* argv[])
 {
 	// 인수가 없으면 축, 큐브, 원뿔, 구가 들어 있는 OBJ를 읽는다.
@@ -156,7 +160,7 @@ int main(int argc, char* argv[])
 	InitBuffer();
 
 	glEnable(GL_DEPTH_TEST);
-
+	s1x = 0, s1y = 0, s1z = 0.5f, s2x = 0, s2y = 0, s2z = -0.5f;
 	//--- 메인 루프
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
 	{
@@ -275,17 +279,348 @@ GLuint make_shaderProgram()
 //--- 출력 함수
 GLvoid drawScene()
 {
-	// 배경 지우기
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(shaderProgramID);
+	glBindVertexArray(VAO);
 
-	// 도형과 좌표축을 그리는 코드는 여기에 작성한다.
+	glm::mat4 cube(1.0f);
+	cube = glm::rotate(cube, glm::radians(-30.0f), glm::vec3(1, 0, 0));
+	cube = glm::rotate(cube, glm::radians(-30.0f), glm::vec3(0, 1, 0));
+	glm::mat4 transform(1.0f);
+	glm::mat4 model(1.0f);
+	transform = model * cube;
+	GLint modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform");
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+	glDrawArrays(GL_LINES, 0, 6);
+
+	if (shape1 == 0)
+	{
+		model = glm::mat4(1.0f);
+		if (s1X == 1)
+		{
+			r1x++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1X == 2)
+		{
+			r1x--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1Y == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1Y == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1R == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1R == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1A == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1A == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1B == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1B == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 6, 36);
+	}
+	else if (shape1 == 1)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+		model = glm::scale(model, glm::vec3(0.1f));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 42, 192);
+	}
+
+	else if (shape1 == 2)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+		model = glm::scale(model, glm::vec3(0.1f));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 234, 2880);
+	}
+
+	if (shape2 == 0)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+		model = glm::scale(model, glm::vec3(0.1f));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 6, 36);
+	}
+
+	else if (shape2 == 1)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+		model = glm::scale(model, glm::vec3(0.1f));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 42, 192);
+	}
+
+	else if (shape2 == 2)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+		model = glm::scale(model, glm::vec3(0.1f));
+		transform = cube * model;
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glDrawArrays(GL_TRIANGLES, 234, 2880);
+	}
 }
 
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	{
+		is1 = true;
+		is2 = false;
+	}
+	else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	{
+		is1 = false;
+		is2 = true;
+	}
+	else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+	{
+		is1 = true;
+		is2 = true;
+	}
+	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+		{
+			s1X++;
+			if (s1X > 2)
+			{
+				s1X = 0;
+				r1x = r1y = 0;
+				r1z = 1.0f;
+			}
+		}
+		if (is2 == true)
+		{
+			s2X++;
+			if (s2X > 2)
+			{
+				s2X = 0;
+				r2x = r2y = r2z = 0;
+			}
+		}
+	}
 
+	if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+		{
+			s1Y++;
+			if (s1Y > 2)
+			{
+				s1Y = 0;
+				r1x = r1y = 0;
+				r1z = 1.0f;
+			}
+		}
+		if (is2 == true)
+		{
+			s2Y++;
+			if (s2Y > 2)
+			{
+				s2Y = 0;
+				r2x = r2y = r2z = 0;
+			}
+		}
+	}
+
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+		{
+			s1R++;
+			if (s1R > 2)
+			{
+				s1R = 0;
+				r1x = r1y = 0;
+				r1z = 1.0f;
+			}
+		}
+		if (is2 == true)
+		{
+			s2R++;
+			if (s2R > 2)
+			{
+				s2R = 0;
+				r2x = r2y = r2z = 0;
+			}
+		}
+	}
+
+	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+		{
+			s1A++;
+			if (s1A > 2)
+			{
+				s1A = 0;
+				r1x = r1y = 0;
+				r1z = 1.0f;
+			}
+		}
+		if (is2 == true)
+		{
+			s2A++;
+			if (s2A > 2)
+			{
+				s2A = 0;
+				r2x = r2y = r2z = 0;
+			}
+		}
+	}
+
+	if (key == GLFW_KEY_B && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+		{
+			s1B++;
+			if (s1B > 2)
+			{
+				s1B = 0;
+				r1x = r1y = 0;
+				r1z = 1.0f;
+			}
+		}
+		if (is2 == true)
+		{
+			s2B++;
+			if (s2B > 2)
+			{
+				s2B = 0;
+				r2x = r2y = r2z = 0;
+			}
+		}
+	}
+
+	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+			s1x -= 0.1f;
+		if (is2 == true)
+			s2x -= 0.1f;
+	}
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+			s1x += 0.1f;
+		if (is2 == true)
+			s2x += 0.1f;
+	}
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+			s1y += 0.1f;
+		if (is2 == true)
+			s2y += 0.1f;
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		if (is1 == true)
+			s1y -= 0.1f;
+		if (is2 == true)
+			s2y -= 0.1f;
+	}
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	{
+		int temp = shape1;
+		while (1)
+		{
+			shape1 = rand() % 3;
+			if (shape1 != temp)
+				break;
+		}
+		temp = shape2;
+		while (1)
+		{
+			shape2 = rand() % 3;
+			if (shape2 != temp)
+				break;
+		}
+	}
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	{
+
+	}
 }
 
 //--- 마우스 버튼 입력 콜백 함수
