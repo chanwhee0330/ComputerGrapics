@@ -120,6 +120,7 @@ int main(void)
 	shaderProgramID = make_shaderProgram();
 
 	InitBuffer();
+	glEnable(GL_DEPTH_TEST);
 
 	//--- 메인 루프
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
@@ -241,7 +242,7 @@ GLvoid drawScene()
 {
 	// 1. 배경 지우기
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// 2. 사용할 셰이더와 정점 데이터 선택
 	glUseProgram(shaderProgramID);

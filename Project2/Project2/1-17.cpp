@@ -72,9 +72,10 @@ void free_model(Model* model);
 void make_model_vertices(const Model& model);
 void InitBuffer();
 
-int shape1, shape2,s1X,s2X,s1Y,s2Y,s1R,s2R,s1A,s2A,s1B,s2B;
-float s1x, s1y, s1z, s2x, s2y, s2z,r1x,r1y,r1z = 1.0f,r2x,r2y,r2z;
-bool is1, is2;
+int shape1=0, shape2=1,s1X,s2X,s1Y,s2Y,s1R,s2R,s1A,s2A,s1B,s2B,checkU;
+float s1x, s1y, s1z, s2x, s2y, s2z,r1x,r1y,r1z = 1.0f,r2x,r2y,r2z = 1.0f;
+float temp1x, temp1y, temp1z, temp2x, temp2y, temp2z;
+bool is1=true, is2,isT,check1,check2,check3,check4,check5,check6,isU,isV;
 
 int main(int argc, char* argv[])
 {
@@ -294,6 +295,158 @@ GLvoid drawScene()
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_LINES, 0, 6);
 
+	if (isT)
+	{
+		check1 = std::fabs(s1x - temp2x) <= 0.01f; // 실수의 절대값 fabs
+		if (check1)
+			s1x = temp2x;
+		else if (s1x > temp2x)
+			s1x -= 0.01f;
+		else
+			s1x += 0.01f;
+
+		check2 = std::fabs(s1y - temp2y) <= 0.01f;
+		if (check2)
+			s1y = temp2y;
+		else if (s1y > temp2y)
+			s1y -= 0.01f;
+		else
+			s1y += 0.01f;
+
+		check3 = std::fabs(s1z - temp2z) <= 0.01f;
+		if (check3)
+			s1z = temp2z;
+		else if (s1z > temp2z)
+			s1z -= 0.01f;
+		else
+			s1z += 0.01f;
+
+		check4 = std::fabs(s2x - temp1x) <= 0.01f;
+		if (check4)
+			s2x = temp1x;
+		else if (s2x > temp1x)
+			s2x -= 0.01f;
+		else
+			s2x += 0.01f;
+
+		check5 = std::fabs(s2y - temp1y) <= 0.01f;
+		if (check5)
+			s2y = temp1y;
+		else if (s2y > temp1y)
+			s2y -= 0.01f;
+		else
+			s2y += 0.01f;
+
+		check6 = std::fabs(s2z - temp1z) <= 0.01f;
+		if (check6)
+			s2z = temp1z;
+		else if (s2z > temp1z)
+			s2z -= 0.01f;
+		else
+			s2z += 0.01f;
+
+		if (check1 == true && check2 == true && check3 == true && check4 == true && check5 == true && check6 == true)
+		{
+			isT = false;
+			check1 = check2 = check3 = check4 = check5 = check6 = false;
+		}
+	}
+
+	if (isU)
+	{
+		if (checkU == 0)
+		{
+			if (s1y < temp1y + 0.5f)
+				s1y += 0.01f;
+			else
+			{
+				s1y = temp1y + 0.5f;
+				check2 = true;
+			}
+
+			if (s2y > temp2y - 0.5f)
+				s2y -= 0.01f;
+			else
+			{
+				s2y = temp2y - 0.5f;
+				check4 = true;
+			}
+
+			if (check2 == true && check4 == true)
+				checkU++;
+		}
+		else if (checkU == 1)
+		{
+			check1 = std::fabs(s1x - temp2x) <= 0.01f; // 실수의 절대값 fabs
+			if (check1)
+				s1x = temp2x;
+			else if (s1x > temp2x)
+				s1x -= 0.01f;
+			else
+				s1x += 0.01f;
+
+			check3 = std::fabs(s1z - temp2z) <= 0.01f;
+			if (check3)
+				s1z = temp2z;
+			else if (s1z > temp2z)
+				s1z -= 0.01f;
+			else
+				s1z += 0.01f;
+
+			check4 = std::fabs(s2x - temp1x) <= 0.01f;
+			if (check4)
+				s2x = temp1x;
+			else if (s2x > temp1x)
+				s2x -= 0.01f;
+			else
+				s2x += 0.01f;
+
+			check6 = std::fabs(s2z - temp1z) <= 0.01f;
+			if (check6)
+				s2z = temp1z;
+			else if (s2z > temp1z)
+				s2z -= 0.01f;
+			else
+				s2z += 0.01f;
+
+			if (check1 && check3 && check4 && check6)
+			{
+				checkU++;
+				check1 = check2 = check3 = check4 = check5 = check6 = false;
+			}
+		}
+		else if (checkU == 2)
+		{
+			check2 = std::fabs(s1y - temp2y) <= 0.01f;
+			if (check2)
+			{
+				s1y = temp2y;
+			}
+			else if (s1y > temp2y)
+				s1y -= 0.01f;
+			else
+				s1y += 0.01f;
+
+			check4 = std::fabs(s2y - temp1y) <= 0.01f;
+			if (check4)
+			{
+				s2y = temp1y;
+			}
+			else if (s2y > temp1y)
+				s2y -= 0.01f;
+			else
+				s2y += 0.01f;
+
+			if (check2 && check4)
+			{
+				isU = false;
+				checkU = 0;
+				check1 = check2 = check3 = check4 = check5 = check6 = false;
+			}
+		}
+
+	}
+
 	if (shape1 == 0)
 	{
 		model = glm::mat4(1.0f);
@@ -350,7 +503,6 @@ GLvoid drawScene()
 			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
 			model = glm::scale(model, glm::vec3(0.1f));
 			model = glm::scale(model, glm::vec3(r1z));
-			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
 		}
 		else if (s1A == 2)
 		{
@@ -359,7 +511,6 @@ GLvoid drawScene()
 			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
 			model = glm::scale(model, glm::vec3(0.1f));
 			model = glm::scale(model, glm::vec3(r1z));
-			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
 		}
 		else if (s1B == 1)
 		{
@@ -379,6 +530,17 @@ GLvoid drawScene()
 			model = glm::scale(model, glm::vec3(0.1f));
 			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
 		}
+		else if (isV)
+		{
+			r1y += 1.0f;
+			r1x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r1y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::rotate(model, glm::radians(r1x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		else
 		{
 			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
@@ -391,8 +553,102 @@ GLvoid drawScene()
 	else if (shape1 == 1)
 	{
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
-		model = glm::scale(model, glm::vec3(0.1f));
+		if (s1X == 1)
+		{
+			r1x++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1X == 2)
+		{
+			r1x--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1Y == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1Y == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1R == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1R == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1A == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+		}
+		else if (s1A == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+		}
+		else if (s1B == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1B == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (isV)
+		{
+			r1y += 1.0f;
+			r1x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r1y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::rotate(model, glm::radians(r1x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		transform = cube * model;
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 		glDrawArrays(GL_TRIANGLES, 42, 192);
@@ -401,8 +657,102 @@ GLvoid drawScene()
 	else if (shape1 == 2)
 	{
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
-		model = glm::scale(model, glm::vec3(0.1f));
+		if (s1X == 1)
+		{
+			r1x++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1X == 2)
+		{
+			r1x--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1x), glm::vec3(1, 0, 0));
+		}
+		else if (s1Y == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1Y == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1R == 1)
+		{
+			r1y++;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1R == 2)
+		{
+			r1y--;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::translate(model, glm::vec3(-s1x, -s1y, -s1z));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s1A == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+		}
+		else if (s1A == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r1z));
+		}
+		else if (s1B == 1)
+		{
+			if (r1z < 5.0f)
+				r1z += 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (s1B == 2)
+		{
+			if (r1z > 0.1f)
+				r1z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r1z));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r1y), glm::vec3(0, 1, 0));
+		}
+		else if (isV)
+		{
+			r1y += 1.0f;
+			r1x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r1y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::rotate(model, glm::radians(r1x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s1x, s1y, s1z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		transform = cube * model;
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 		glDrawArrays(GL_TRIANGLES, 234, 2880);
@@ -411,8 +761,102 @@ GLvoid drawScene()
 	if (shape2 == 0)
 	{
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
-		model = glm::scale(model, glm::vec3(0.1f));
+		if (s2X == 1)
+		{
+			r2x++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2X == 2)
+		{
+			r2x--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2Y == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2Y == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2R == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2R == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2A == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2A == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2B == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2B == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (isV)
+		{
+			r2y += 1.0f;
+			r2x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r2y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::rotate(model, glm::radians(r2x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		transform = cube * model;
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 		glDrawArrays(GL_TRIANGLES, 6, 36);
@@ -421,8 +865,102 @@ GLvoid drawScene()
 	else if (shape2 == 1)
 	{
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
-		model = glm::scale(model, glm::vec3(0.1f));
+		if (s2X == 1)
+		{
+			r2x++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2X == 2)
+		{
+			r2x--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2Y == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2Y == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2R == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2R == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2A == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2A == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2B == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2B == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (isV)
+		{
+			r2y += 1.0f;
+			r2x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r2y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::rotate(model, glm::radians(r2x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		transform = cube * model;
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 		glDrawArrays(GL_TRIANGLES, 42, 192);
@@ -431,8 +969,102 @@ GLvoid drawScene()
 	else if (shape2 == 2)
 	{
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
-		model = glm::scale(model, glm::vec3(0.1f));
+		if (s2X == 1)
+		{
+			r2x++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2X == 2)
+		{
+			r2x--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2x), glm::vec3(1, 0, 0));
+		}
+		else if (s2Y == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2Y == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2R == 1)
+		{
+			r2y++;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2R == 2)
+		{
+			r2y--;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::translate(model, glm::vec3(-s2x, -s2y, -s2z));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else if (s2A == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2A == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::scale(model, glm::vec3(r2z));
+		}
+		else if (s2B == 1)
+		{
+			if (r2z < 5.0f)
+				r2z += 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (s2B == 2)
+		{
+			if (r2z > 0.1f)
+				r2z -= 0.05f;
+			model = glm::scale(model, glm::vec3(r2z));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+			model = glm::rotate(model, glm::radians(r2y), glm::vec3(0, 1, 0));
+		}
+		else if (isV)
+		{
+			r2y += 1.0f;
+			r2x += 3.0f;
+			model = glm::mat4(1.0f);
+			model = glm::scale(model, glm::vec3(1.5f));
+			model = glm::rotate(model, glm::radians(r2y),glm::vec3(0, 1, 0));
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::rotate(model, glm::radians(r2x),glm::vec3(1, 0, 0));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
+		else
+		{
+			model = glm::translate(model, glm::vec3(s2x, s2y, s2z));
+			model = glm::scale(model, glm::vec3(0.1f));
+		}
 		transform = cube * model;
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
 		glDrawArrays(GL_TRIANGLES, 234, 2880);
@@ -442,6 +1074,30 @@ GLvoid drawScene()
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		// 도형 종류와 선택 상태를 처음 상태로 되돌린다.
+		shape1 = 0;
+		shape2 = 1;
+		is1 = true;
+		is2 = false;
+
+		s1x = s1y = s2x = s2y = 0.0f;
+		s1z = 0.5f;
+		s2z = -0.5f;
+		r1x = r1y = r2x = r2y = 0.0f;
+		r1z = r2z = 1.0f;
+
+		s1X = s1Y = s1R = s1A = s1B = 0;
+		s2X = s2Y = s2R = s2A = s2B = 0;
+		isT = isU = isV = false;
+		checkU = 0;
+		check1 = check2 = check3 = check4 = check5 = check6 = false;
+		temp1x = temp1y = temp1z = 0.0f;
+		temp2x = temp2y = temp2z = 0.0f;
+		return;
+	}
+
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 	{
 		is1 = true;
@@ -475,7 +1131,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			if (s2X > 2)
 			{
 				s2X = 0;
-				r2x = r2y = r2z = 0;
+				r2x = r2y = 0;
+				r2z = 1.0f;
 			}
 		}
 	}
@@ -498,7 +1155,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			if (s2Y > 2)
 			{
 				s2Y = 0;
-				r2x = r2y = r2z = 0;
+				r2x = r2y = 0;
+				r2z = 1.0f;
 			}
 		}
 	}
@@ -521,7 +1179,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			if (s2R > 2)
 			{
 				s2R = 0;
-				r2x = r2y = r2z = 0;
+				r2x = r2y = 0;
+				r2z = 1.0f;
 			}
 		}
 	}
@@ -544,7 +1203,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			if (s2A > 2)
 			{
 				s2A = 0;
-				r2x = r2y = r2z = 0;
+				r2x = r2y = 0;
+				r2z = 1.0f;
 			}
 		}
 	}
@@ -567,7 +1227,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			if (s2B > 2)
 			{
 				s2B = 0;
-				r2x = r2y = r2z = 0;
+				r2x = r2y = 0;
+				r2z = 1.0f;
 			}
 		}
 	}
@@ -619,7 +1280,38 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_T && action == GLFW_PRESS)
 	{
-
+		isT = !isT;
+		if (isT)
+		{
+			isU = false;
+			check1 = check2 = check3 = check4 = check5 = check6 = false;
+			temp1x = s1x;
+			temp1y = s1y;
+			temp1z = s1z;
+			temp2x = s2x;
+			temp2y = s2y;
+			temp2z = s2z;
+		}
+	}
+	if (key == GLFW_KEY_U && action == GLFW_PRESS)
+	{
+		isU = !isU;
+		if (isU)
+		{
+			isT = false;
+			checkU = 0;
+			check1 = check2 = check3 = check4 = check5 = check6 = false;
+			temp1x = s1x;
+			temp1y = s1y;
+			temp1z = s1z;
+			temp2x = s2x;
+			temp2y = s2y;
+			temp2z = s2z;
+		}
+	}
+	if (key == GLFW_KEY_V && action == GLFW_PRESS)
+	{
+		isV = !isV;
 	}
 }
 
