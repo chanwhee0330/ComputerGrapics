@@ -1521,7 +1521,7 @@ bool read_obj_file(const char* filename, Model* model)
 	return true;
 }
 
-//--- OBJ의 면과 선을 읽은 순서대로 하나의 vertices 배열에 펼친다.
+//--- OBJ의 면과 선을 읽은 순서대로 하나의 vertices 배열에 펼친다. 
 void make_model_vertices(const Model& model)
 {
 	vertices.clear();
