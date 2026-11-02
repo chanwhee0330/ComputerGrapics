@@ -112,6 +112,10 @@ void InitBuffer();
 
 float Zangle,Yangle;
 int isZ,isY;
+bool floorOpen = false;
+float floorAngle = 0.0f;
+bool dragging = false;
+double lastMouseX = 0.0;
 
 int main(void)
 {
@@ -190,8 +194,8 @@ int main(void)
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glDisable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 	//--- 메인 루프
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
@@ -307,6 +311,22 @@ GLuint make_shaderProgram()
 //--- 출력 함수
 GLvoid drawScene()
 {
+	static double lastTime = glfwGetTime();
+	double now = glfwGetTime();
+	float dt = glm::clamp(float(now - lastTime), 0.0f, 0.05f);
+	lastTime = now;
+
+	glfwGetFramebufferSize(glfwGetCurrentContext(), &width, &height);
+	if (width == 0 || height == 0) return;
+	glViewport(0, 0, width, height);
+
+	// O 키로 바닥을 뒤쪽 모서리에서 아래로 90도 여닫는다.
+	if (floorOpen)
+		floorAngle = glm::min(floorAngle + 90.0f * dt, 90.0f);
+	else
+		floorAngle = glm::max(floorAngle - 90.0f * dt, 0.0f);
+	const bool hasFloor = !floorOpen && floorAngle == 0.0f;
+
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shaderProgramID);
@@ -323,19 +343,17 @@ GLvoid drawScene()
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 
 	if (isZ == 1)
-		Zangle+=0.1f;
+		Zangle += 6.0f * dt;
 	else if (isZ == 2)
-		Zangle-=0.1f;
-	else
-		Zangle = 0;
+		Zangle -= 6.0f * dt;
 
 	if (isY == 1)
-		Yangle += 0.1f;
+		Yangle += 6.0f * dt;
 	else if (isY == 2)
-		Yangle -= 0.1f;
-	else
-		Yangle = 0;
+		Yangle -= 6.0f * dt;
 
+	// 방만 앞면을 컬링한다. 회전해도 카메라 쪽 외벽은 사라지고 안쪽이 보인다.
+	glCullFace(GL_FRONT);
 	glVertexAttrib3f(1, 0.25f, 0.25f, 0.25f);
 	model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(Zangle), glm::vec3(0, 0, 1));
@@ -353,6 +371,10 @@ GLvoid drawScene()
 	transform = projection * view * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 6, 6);
+
+	// +Z 면도 그려야 Y축 회전 후 반대편에서 방 안쪽을 볼 수 있다.
+	glVertexAttrib3f(1, 0.28f, 0.28f, 0.28f);
+	glDrawArrays(GL_TRIANGLES, 12, 6);
 
 	glVertexAttrib3f(1, 0.35f, 0.35f, 0.35f);
 	model = glm::mat4(1.0f);
@@ -376,20 +398,25 @@ GLvoid drawScene()
 	model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(Zangle), glm::vec3(0, 0, 1));
 	model = glm::rotate(model, glm::radians(Yangle), glm::vec3(0, 1, 0));
+	// 바닥 뒤쪽 모서리 (0, -5, -5)를 경첩으로 사용한다.
+	model = glm::translate(model, glm::vec3(0, -5, -5));
+	model = glm::rotate(model, glm::radians(floorAngle), glm::vec3(1, 0, 0));
+	model = glm::translate(model, glm::vec3(0, 5, 5));
 	model = glm::scale(model, glm::vec3(10, 10, 10));
 	transform = projection * view * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+	// 열린 바닥은 양쪽에서 보이게 한다.
+	if (floorAngle > 0.0f)
+		glDisable(GL_CULL_FACE);
 	glDrawArrays(GL_TRIANGLES, 30, 6);
+	glEnable(GL_CULL_FACE);
+	// 내부 상자와 공은 바깥 면이 보여야 하므로 뒷면을 컬링한다.
+	glCullFace(GL_BACK);
 
 	static glm::vec3 position(0, -4.5f, 0);
 	static glm::vec3 velocity(0);
-	static double lastTime = glfwGetTime();
 
-	double now = glfwGetTime();
-	float dt = glm::clamp(float(now - lastTime), 0.0f, 0.05f);
-	lastTime = now;
-
-	if (isY == 1 || isY == 2)
+	if ((isY == 1 || isY == 2) && hasFloor)
 	{
 		// Y축 회전 중에는 방 내부 위치 유지
 		velocity = glm::vec3(0);
@@ -402,14 +429,14 @@ GLvoid drawScene()
 		position += velocity * dt;
 
 		// 좌우 벽 충돌
-		if (position.x < -4.5f || position.x > 4.5f)
+		if (position.y >= -5.5f && (position.x < -4.5f || position.x > 4.5f))
 		{
 			position.x = glm::clamp(position.x, -4.5f, 4.5f);
 			velocity.x = 0.0f;
 		}
 
 		// 바닥과 천장 충돌
-		if (position.y < -4.5f || position.y > 4.5f)
+		if (position.y > 4.5f || (hasFloor && position.y >= -5.5f && position.y < -4.5f))
 		{
 			position.y = glm::clamp(position.y, -4.5f, 4.5f);
 			velocity.y = 0.0f;
@@ -434,7 +461,7 @@ GLvoid drawScene()
 	static glm::vec3 position2(0, -4.0f, -2.0f);
 	static glm::vec3 velocity2(0);
 
-	if (isY == 1 || isY == 2)
+	if ((isY == 1 || isY == 2) && hasFloor)
 	{
 		// Y축 회전 중에는 방 내부 위치 유지
 		velocity2 = glm::vec3(0);
@@ -447,13 +474,13 @@ GLvoid drawScene()
 		position2 += velocity2 * dt;
 
 		// 한 변이 2이므로 중심의 이동 범위는 ±4이다.
-		if (position2.x < -4.0f || position2.x > 4.0f)
+		if (position2.y >= -6.0f && (position2.x < -4.0f || position2.x > 4.0f))
 		{
 			position2.x = glm::clamp(position2.x, -4.0f, 4.0f);
 			velocity2.x = 0.0f;
 		}
 
-		if (position2.y < -4.0f || position2.y > 4.0f)
+		if (position2.y > 4.0f || (hasFloor && position2.y >= -6.0f && position2.y < -4.0f))
 		{
 			position2.y = glm::clamp(position2.y, -4.0f, 4.0f);
 			velocity2.y = 0.0f;
@@ -479,7 +506,7 @@ GLvoid drawScene()
 	static glm::vec3 position3(0, -4.75f, 2.0f);
 	static glm::vec3 velocity3(0);
 
-	if (isY == 1 || isY == 2)
+	if ((isY == 1 || isY == 2) && hasFloor)
 	{
 		velocity3 = glm::vec3(0);
 	}
@@ -490,13 +517,13 @@ GLvoid drawScene()
 		position3 += velocity3 * dt;
 
 		// 한 변이 0.5이므로 중심의 이동 범위는 ±4.75이다.
-		if (position3.x < -4.75f || position3.x > 4.75f)
+		if (position3.y >= -5.25f && (position3.x < -4.75f || position3.x > 4.75f))
 		{
 			position3.x = glm::clamp(position3.x, -4.75f, 4.75f);
 			velocity3.x = 0.0f;
 		}
 
-		if (position3.y < -4.75f || position3.y > 4.75f)
+		if (position3.y > 4.75f || (hasFloor && position3.y >= -5.25f && position3.y < -4.75f))
 		{
 			position3.y = glm::clamp(position3.y, -4.75f, 4.75f);
 			velocity3.y = 0.0f;
@@ -524,25 +551,31 @@ GLvoid drawScene()
 
 	for (int i = 0; i < ballCount; ++i)
 	{
+		// 바닥이 열려 있는 동안은 공도 중력을 받아 방 아래로 떨어진다.
+		if (!hasFloor)
+		{
+			balls[i].velocity.x -= 9.8f * glm::sin(glm::radians(Zangle)) * dt;
+			balls[i].velocity.y -= 9.8f * glm::cos(glm::radians(Zangle)) * dt;
+		}
 		balls[i].position.x += balls[i].velocity.x * dt;
 		balls[i].position.y += balls[i].velocity.y * dt;
 
 		// 왼쪽 벽: 오른쪽으로 튕김
-		if (balls[i].position.x < -limit)
+		if (balls[i].position.y >= -5.0f - ballRadius && balls[i].position.x < -limit)
 		{
 			balls[i].position.x = -limit;
 			balls[i].velocity.x = glm::abs(balls[i].velocity.x);
 		}
 
 		// 오른쪽 벽: 왼쪽으로 튕김
-		if (balls[i].position.x > limit)
+		if (balls[i].position.y >= -5.0f - ballRadius && balls[i].position.x > limit)
 		{
 			balls[i].position.x = limit;
 			balls[i].velocity.x = -glm::abs(balls[i].velocity.x);
 		}
 
 		// 바닥: 위쪽으로 튕김
-		if (balls[i].position.y < -limit)
+		if (hasFloor && balls[i].position.y >= -5.0f - ballRadius && balls[i].position.y < -limit)
 		{
 			balls[i].position.y = -limit;
 			balls[i].velocity.y = glm::abs(balls[i].velocity.y);
@@ -569,6 +602,9 @@ GLvoid drawScene()
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+		floorOpen = !floorOpen;
+
 	if (key == GLFW_KEY_B && action == GLFW_PRESS && ballCount < 5)
 	{
 		balls[ballCount].position = glm::vec2(-3.0f + ballCount * 1.5f, 0.0f);
@@ -580,17 +616,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
 	{
-		if (isZ < 3)
-			isZ++;
-		else
-			isZ = 0;
+		isZ = (isZ + 1) % 3;
 	}
 	if (key == GLFW_KEY_Y && action == GLFW_PRESS)
 	{
-		if (isY < 3)
-			isY++;
-		else
-			isY = 0;
+		isY = (isY + 1) % 3;
 	}
 }
 
@@ -599,24 +629,25 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-
-	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-	{
-
+		dragging = true;
+		double mouseY;
+		glfwGetCursorPos(window, &lastMouseX, &mouseY);
+		isZ = 0; // 드래그 중에는 자동 Z축 회전을 멈춘다.
 	}
 	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
 	{
-
+		dragging = false;
 	}
 }
 
 //--- 마우스 위치 입력 콜백 함수
 void GetCursorPose(GLFWwindow* window, double xpos, double ypos)
 {
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (dragging && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-
+		// 왼쪽 드래그는 반시계 방향, 오른쪽 드래그는 시계 방향이다.
+		Zangle -= static_cast<float>(xpos - lastMouseX) * 0.25f;
+		lastMouseX = xpos;
 	}
 }
 
@@ -675,8 +706,8 @@ void InitBall()
 			float c = 2 * pi * j / columns;
 			float d = 2 * pi * (j + 1) / columns;
 			glm::vec3 points[] = {
-				point(a, c), point(a, d), point(b, d),
-				point(a, c), point(b, d), point(b, c)
+				point(a, c), point(b, d), point(a, d),
+				point(a, c), point(b, c), point(b, d)
 			};
 			for (glm::vec3 p : points)
 			{

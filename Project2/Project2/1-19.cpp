@@ -311,11 +311,22 @@ GLvoid drawScene()
 
 	glm::mat4 projection = glm::perspective(glm::radians(50.0f), aspect, 0.1f, 100.0f);
 
+	// 수평으로 45도 돌아간 위치에서 탱크 중앙을 비스듬히 내려다보는 쿼터뷰.
+	const float cameraYaw = glm::radians(45.0f + cameraR);
+	const glm::vec3 viewDirection(-5.0f * glm::sin(cameraYaw), -3.5f,
+		-5.0f * glm::cos(cameraYaw));
 	glm::mat4 view;
 	if (isR == false)
-		view = glm::lookAt(glm::vec3(camerax, cameray + 0.5f, cameraz + 5.0f), glm::vec3(camerax + 5.0f * glm::sin(glm::radians(cameraR)), cameray, cameraz + 5.0f - 5.0f * glm::cos(glm::radians(cameraR))), glm::vec3(0.0f, 1.0f, 0.0f));
+	{
+		const glm::vec3 eye(camerax + 3.535534f, cameray + 4.0f, cameraz + 3.535534f);
+		view = glm::lookAt(eye, eye + viewDirection, glm::vec3(0, 1, 0));
+	}
 	else
-		view = glm::lookAt(glm::vec3(5.0f * glm::sin(glm::radians(cameraR)), 0.5f, 5.0f * glm::cos(glm::radians(cameraR))), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	{
+		// 공전 중에도 높이를 유지하며 탱크 중앙을 내려다본다.
+		const glm::vec3 eye(-viewDirection.x, 4.0f, -viewDirection.z);
+		view = glm::lookAt(eye, glm::vec3(0, 0.5f, 0), glm::vec3(0, 1, 0));
+	}
 
 	glm::mat4 model(1.0f);
 	glm::mat4 groupMove(1.0f);
@@ -387,6 +398,10 @@ GLvoid drawScene()
 		}
 	}
 
+	// 중앙 몸체의 회전을 상부 몸체, 깃대, 포신에 함께 적용한다.
+	const glm::mat4 upperRotation = glm::rotate(glm::mat4(1.0f),
+		glm::radians(rotateT), glm::vec3(0, 1, 0));
+
 	glVertexAttrib3f(1, 0.678f, 0.847f, 0.902f);
 	model = glm::scale(model, glm::vec3(100, 0.1, 100));
 	transform = projection * view * model;
@@ -432,7 +447,7 @@ GLvoid drawScene()
 	//model = glm::rotate(model, glm::radians(x), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	transform = projection * view * groupMove * model;
+	transform = projection * view * groupMove * upperRotation * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 왼쪽 상부 몸체
 
@@ -442,7 +457,7 @@ GLvoid drawScene()
 	//model = glm::rotate(model, glm::radians(x), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	transform = projection * view * groupMove * model;
+	transform = projection * view * groupMove * upperRotation * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 오른쪽 상부 몸체
 
@@ -450,26 +465,26 @@ GLvoid drawScene()
 	model = glm::mat4(1.0f);
 	groupMove = glm::mat4(1.0f);
 	glm::mat4 roP(1.0f);
-	model = glm::translate(model, glm::vec3(-0.5f, 1.11f + 0.2f * sizeD, 0.0f));
+	model = glm::translate(model, glm::vec3(leftx, 1.11f + 0.2f * sizeD, 0.0f));
 	model = glm::scale(model, glm::vec3(0.3f, 3.0f, 0.3f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	roP = glm::translate(roP, glm::vec3(-0.5f, (1.11f + 0.2f * sizeD) - 0.3f, 0.0f));
+	roP = glm::translate(roP, glm::vec3(leftx, (1.11f + 0.2f * sizeD) - 0.3f, 0.0f));
 	roP = glm::rotate(roP, glm::radians(rotateP), glm::vec3(1, 0, 0));
-	roP = glm::translate(roP, glm::vec3(0.5f, -((1.11f + 0.2f * sizeD) - 0.3f), 0.0f));
-	transform = projection * view * groupMove * roP * model;
+	roP = glm::translate(roP, glm::vec3(-leftx, -((1.11f + 0.2f * sizeD) - 0.3f), 0.0f));
+	transform = projection * view * groupMove * upperRotation * roP * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 왼쪽 깃대
 
 	model = glm::mat4(1.0f);
 	groupMove = glm::mat4(1.0f);
 	roP = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.5f, 1.11f + 0.2f * sizeD, 0.0f));
+	model = glm::translate(model, glm::vec3(rightx, 1.11f + 0.2f * sizeD, 0.0f));
 	model = glm::scale(model, glm::vec3(0.3f, 3.0f, 0.3f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	roP = glm::translate(roP, glm::vec3(0.5f, (1.11f + 0.2f * sizeD) - 0.3f, 0.0f));
+	roP = glm::translate(roP, glm::vec3(rightx, (1.11f + 0.2f * sizeD) - 0.3f, 0.0f));
 	roP = glm::rotate(roP, glm::radians(-rotateP), glm::vec3(1, 0, 0));
-	roP = glm::translate(roP, glm::vec3(-0.5f, -((1.11f + 0.2f * sizeD) - 0.3f), 0.0f));
-	transform = projection * view * groupMove * roP * model;
+	roP = glm::translate(roP, glm::vec3(-rightx, -((1.11f + 0.2f * sizeD) - 0.3f), 0.0f));
+	transform = projection * view * groupMove * upperRotation * roP * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 오른쪽 깃대
 
@@ -477,26 +492,26 @@ GLvoid drawScene()
 	model = glm::mat4(1.0f);
 	groupMove = glm::mat4(1.0f);
 	glm::mat4 roG(1.0f);
-	model = glm::translate(model, glm::vec3(-0.5f, 0.71f + 0.2f * sizeD, 0.4f));
+	model = glm::translate(model, glm::vec3(leftx, 0.71f + 0.2f * sizeD, 0.4f));
 	model = glm::scale(model, glm::vec3(0.3f, 0.2f, 3.0f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	roG = glm::translate(roG, glm::vec3(-0.5f, 0.71f + 0.2f * sizeD, 0.1f));
+	roG = glm::translate(roG, glm::vec3(leftx, 0.71f + 0.2f * sizeD, 0.1f));
 	roG = glm::rotate(roG, glm::radians(rotateG), glm::vec3(0.0f, 1.0f, 0.0f));
-	roG = glm::translate(roG, glm::vec3(0.5f, (0.71f + 0.2f * sizeD) * -1, -0.1f));
-	transform = projection * view * groupMove * roG * model;
+	roG = glm::translate(roG, glm::vec3(-leftx, (0.71f + 0.2f * sizeD) * -1, -0.1f));
+	transform = projection * view * groupMove * upperRotation * roG * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 왼쪽 포신
 
 	model = glm::mat4(1.0f);
 	groupMove = glm::mat4(1.0f);
 	roG = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.5f, 0.71f + 0.2f * sizeD, 0.4f));
+	model = glm::translate(model, glm::vec3(rightx, 0.71f + 0.2f * sizeD, 0.4f));
 	model = glm::scale(model, glm::vec3(0.3f, 0.2f, 3.0f));
 	groupMove = glm::translate(groupMove, glm::vec3(moveX, 0, moveZ));
-	roG = glm::translate(roG, glm::vec3(0.5f, 0.71f + 0.2f * sizeD, 0.1f));
+	roG = glm::translate(roG, glm::vec3(rightx, 0.71f + 0.2f * sizeD, 0.1f));
 	roG = glm::rotate(roG, glm::radians(-rotateG), glm::vec3(0.0f, 1.0f, 0.0f));
-	roG = glm::translate(roG, glm::vec3(-0.5f, (0.71f + 0.2f * sizeD) * -1, -0.1f));
-	transform = projection * view * groupMove * roG * model;
+	roG = glm::translate(roG, glm::vec3(-rightx, (0.71f + 0.2f * sizeD) * -1, -0.1f));
+	transform = projection * view * groupMove * upperRotation * roG * model;
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 오른쪽 포신
 
