@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -31,30 +32,74 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLuint VAO;
 GLuint VBO;
+GLuint frontOutlineEBO;
 
+// 정점 하나: x, y, z만 저장 (큐브 36개). 색상은 drawScene()에서 지정한다.
 const GLfloat vertices[] = {
-	// 사각형 한 면: 삼각형 2개, 정점 6개
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.5f,  0.5f, 0.0f,
-	-0.5f, -0.5f, 0.0f,
-	 0.5f,  0.5f, 0.0f,
-	-0.5f,  0.5f, 0.0f,
+	// 면 번호: 0 뒤 -Z, 1 오른쪽 +X, 2 앞 +Z, 3 왼쪽 -X, 4 위 +Y, 5 아래 -Y
+	// 정육면체 뒷면 (z = -0.5)
+	 0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, 0.5f, -0.5f,
 
-	// 선의 시작점과 끝점: 정점 6~7
-	-1.5f, 0.0f, 0.0f,
-	 1.5f, 0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,
+	-0.5f, 0.5f, -0.5f,
+	 0.5f, 0.5f, -0.5f,
 
-	 -0.5f,-0.5f,0.5f,
-	 0.5f,-0.5f,0.5f,
-	 0.0f,0.5f,0.0f
+	 // 정육면체 오른쪽 면 (x = +0.5)
+	  0.5f, -0.5f, 0.5f,
+	  0.5f, -0.5f, -0.5f,
+	  0.5f, 0.5f, -0.5f,
+
+	  0.5f, -0.5f, 0.5f,
+	  0.5f, 0.5f, -0.5f,
+	  0.5f, 0.5f, 0.5f,
+
+	  // 정육면체 앞면 (z = +0.5)
+	  -0.5f, -0.5f, 0.5f,
+	   0.5f, -0.5f, 0.5f,
+	   0.5f, 0.5f, 0.5f,
+
+	  -0.5f, -0.5f, 0.5f,
+	   0.5f, 0.5f, 0.5f,
+	  -0.5f, 0.5f, 0.5f,
+
+	  // 정육면체 왼쪽 면 (x = -0.5)
+	  -0.5f, -0.5f, -0.5f,
+	  -0.5f, -0.5f, 0.5f,
+	  -0.5f, 0.5f, 0.5f,
+
+	  -0.5f, -0.5f, -0.5f,
+	  -0.5f, 0.5f, 0.5f,
+	  -0.5f, 0.5f, -0.5f,
+
+	  // 정육면체 윗면 (y = +0.5)
+	  -0.5f, 0.5f, 0.5f,
+	   0.5f, 0.5f, 0.5f,
+	   0.5f, 0.5f, -0.5f,
+
+	  -0.5f, 0.5f, 0.5f,
+	   0.5f, 0.5f, -0.5f,
+	  -0.5f, 0.5f, -0.5f,
+
+	  // 정육면체 아랫면 (y = -0.5)
+	  -0.5f, -0.5f, -0.5f,
+	   0.5f, -0.5f, -0.5f,
+	   0.5f, -0.5f, 0.5f,
+
+	  -0.5f, -0.5f, -0.5f,
+	   0.5f, -0.5f, 0.5f,
+	  -0.5f, -0.5f, 0.5f,
+
 };
+
+const GLsizei cubeVertexCount = 36;
 
 void InitBuffer();
 
 int main(void)
 {
-	srand((unsigned int)time(NULL));
+	srand(static_cast<unsigned int>(std::time(nullptr)));
 	GLFWwindow* window;
 	GLenum glewResult;
 
@@ -116,20 +161,25 @@ int main(void)
 	make_vertexShaders();
 	make_fragmentShaders();
 	shaderProgramID = make_shaderProgram();
+	if (shaderProgramID == 0)
+	{
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 
 	InitBuffer();
+
+	glEnable(GL_CULL_FACE); // 컬링 활성화
+	glFrontFace(GL_CCW);   // 반시계 방향 정점을 앞면으로 판정
+	glCullFace(GL_BACK);  // 뒷면 제거
+	glEnable(GL_DEPTH_TEST);
 
 	//--- 메인 루프
 	while (glfwWindowShouldClose(window) == GLFW_FALSE)
 	{
 		//--- 화면 출력
 		drawScene();
-
-		//--- Q 키를 누르면 종료
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		{
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
-		}
 
 		//--- 버퍼 교체 및 이벤트 처리
 		glfwSwapBuffers(window);
@@ -139,6 +189,7 @@ int main(void)
 	//--- 종료 처리
 	glDeleteProgram(shaderProgramID);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &frontOutlineEBO);
 	glDeleteVertexArrays(1, &VAO);
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -150,7 +201,7 @@ int main(void)
 void make_vertexShaders()
 {
 	//--- 세이더 코드 읽어오기
-	std::string vertexSource = filetobuf("vertex6.glsl");
+	std::string vertexSource = filetobuf("vertex7.glsl");
 	const char* source = vertexSource.c_str();
 
 	//--- 세이더 생성하기
@@ -177,7 +228,7 @@ void make_vertexShaders()
 void make_fragmentShaders()
 {
 	//--- 세이더 코드 읽어오기
-	std::string fragmentSource = filetobuf("fragment.glsl");
+	std::string fragmentSource = filetobuf("fragment7.glsl");
 	const char* source = fragmentSource.c_str();
 
 	//--- 세이더 생성하기
@@ -233,61 +284,51 @@ GLuint make_shaderProgram()
 	glUseProgram(shaderID);
 	return shaderID;
 }
-
 //--- 출력 함수
 GLvoid drawScene()
 {
-	// 1. 배경 지우기
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glfwGetFramebufferSize(glfwGetCurrentContext(), &width, &height);
+	if (width == 0 || height == 0) return;
+	glViewport(0, 0, width, height);
 
-	// 2. 사용할 셰이더와 정점 데이터 선택
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glUseProgram(shaderProgramID);
 	glBindVertexArray(VAO);
 
-	// 3. 셰이더에 선언한 uniform 변수의 위치 가져오기
-	GLint modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform");
-	GLint colorLocation = glGetUniformLocation(shaderProgramID, "vColor");
-
-	// 4. 정육면체 전체 회전
-	glm::mat4 cube(1.0f);
-	cube = glm::rotate(cube, glm::radians(30.0f), glm::vec3(1, 0, 0));
-	cube = glm::rotate(cube, glm::radians(30.0f), glm::vec3(0, 1, 0));
-
-	// model: 사각형 한 면의 변환
-	// transform: 면 배치 -> 정육면체 전체 회전 (오른쪽부터 적용)
 	glm::mat4 model(1.0f);
-	glm::mat4 transform(1.0f);
 
-	// 선: 단위 행렬로 원래 좌표 그대로 그리기
+	glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 10.0f, 20.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(width) / float(height), 0.1f, 100.0f); // 원근투영
+	/*float aspect = float(width) / float(height);
+	glm::mat4 projection = glm::ortho(-5.0f * aspect, 5.0f * aspect, -5.0f, 5.0f, 0.1f, 100.0f);*/ //직각투영
+
+	glm::mat4 transform = projection * view * model;
+
+	GLint location = glGetUniformLocation(shaderProgramID, "modelTransform");
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+
+	glVertexAttrib3f(1, 0.25f, 0.25f, 0.25f);
 	model = glm::mat4(1.0f);
-	transform = cube * model;
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 1, 0, 0, 1);
-	glDrawArrays(GL_LINES, 6, 2);
-
-	model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 0, 1));
-	transform = cube * model;
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 0, 1, 0, 1);
-	glDrawArrays(GL_LINES, 6, 2);
-
-	model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1, 0));
-	transform = cube * model;
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	glUniform4f(colorLocation, 0, 0, 1, 1);
-	glDrawArrays(GL_LINES, 6, 2);
+	transform = projection * view * model;
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	location = glGetUniformLocation(shaderProgramID, "modelTransform");
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 
 
+	glBindVertexArray(0);
 
 }
 
 //--- 키보드 입력 콜백 함수
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
 }
 
 //--- 마우스 버튼 입력 콜백 함수
@@ -336,9 +377,17 @@ void InitBuffer()
 	// 좌표 배열을 GPU로 전달
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Location 0에서 정점마다 float 3개씩 읽도록 설정
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	// 정점마다 좌표 float 3개만 읽는다.
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
 	glEnableVertexAttribArray(0);
+
+	// 색상은 VBO에서 읽지 않고, drawScene()의 glVertexAttrib3f() 값으로 사용한다.
+	glDisableVertexAttribArray(1);
+
+	const GLuint frontOutline[] = { 12, 13, 14, 17 };
+	glGenBuffers(1, &frontOutlineEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, frontOutlineEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(frontOutline), frontOutline, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 }
