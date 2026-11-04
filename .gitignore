@@ -11,3 +11,11 @@
 
 # vcpkg generated dependencies
 **/vcpkg_installed/
+
+# Generated Visual Studio outputs
+Project2/bin/
+Project2/obj/
+
+# Bundled libraries are required on other computers.
+!Project2/dependencies/bin/x64/
+!Project2/dependencies/lib/x64/

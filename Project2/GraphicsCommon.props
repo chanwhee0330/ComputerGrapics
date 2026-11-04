@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GraphicsProjectRoot>$(MSBuildThisFileDirectory)</GraphicsProjectRoot>
+    <GraphicsDependencyRoot>$(GraphicsProjectRoot)dependencies\</GraphicsDependencyRoot>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+    <OutDir>$(GraphicsProjectRoot)bin\$(Platform)\$(Configuration)\$(MSBuildProjectName)\</OutDir>
+    <IntDir>$(GraphicsProjectRoot)obj\$(Platform)\$(Configuration)\$(MSBuildProjectName)\</IntDir>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>GLFW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(GraphicsProjectRoot)Project2\compat;$(GraphicsDependencyRoot)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'!='Debug'">MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(GraphicsDependencyRoot)lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glfw3dll.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <GraphicsRuntimeAsset Include="$(GraphicsProjectRoot)Project2\*.glsl" />
+    <GraphicsRuntimeAsset Include="$(GraphicsProjectRoot)Project2\cube.obj" />
+    <GraphicsRuntimeAsset Include="$(GraphicsDependencyRoot)bin\$(Platform)\glew32.dll" />
+    <GraphicsRuntimeAsset Include="$(GraphicsDependencyRoot)bin\$(Platform)\glfw3.dll" />
+  </ItemGroup>
+  <Target Name="CopyGraphicsRuntimeAssets" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)" />
+    <Copy SourceFiles="@(GraphicsRuntimeAsset)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
