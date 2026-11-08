@@ -4,4 +4,7 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="Project2/Project2.vcxproj" Id="6772b37f-756f-4dd1-b3d2-db3c3e369c8f" />
+  <Folder Name="/실습별 실행/">
+    <Project Path="실습프로젝트/practice_1_24.vcxproj" Id="f3280414-452d-4450-b816-134a09073353" />
+  </Folder>
 </Solution>
