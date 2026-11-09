@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\..\..\..\..\..\Downloads\2023184037허찬휘.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="1-26.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cube.obj">
@@ -116,6 +119,8 @@
     <None Include="vertex5.glsl" />
     <None Include="vertex6.glsl" />
     <None Include="vertex7.glsl" />
+    <None Include="vertex8.glsl" />
     <None Include="fragment7.glsl" />
+    <None Include="fragment8.glsl" />
   </ItemGroup>
 </Project>
