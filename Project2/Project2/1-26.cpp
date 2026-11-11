@@ -407,7 +407,7 @@ GLvoid drawScene()
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 		location = glGetUniformLocation(shaderProgramID, "model");
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_LINE_LOOP, orbitVertexStart, orbitVertexCount);
+		glDrawArrays(GL_LINE_LOOP, orbitVertexStart, orbitVertexCount);    
 	}
 
 	glBindVertexArray(0);
